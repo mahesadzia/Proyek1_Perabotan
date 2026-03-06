@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Inventaris - Laporan Penjualan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* CSS SAMA DENGAN HALAMAN DATA BARANG */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { display: flex; background-color: #f4f6f9; min-height: 100vh; overflow-x: hidden; }
+        
+        .sidebar { width: 260px; background-color: #3b82f6; color: white; flex-shrink: 0; transition: all 0.3s; }
+        .profile-box { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .avatar-circle { width: 65px; height: 65px; background: white; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #bdc3c7; font-size: 32px; }
+        
+        .sidebar nav a { display: flex; align-items: center; padding: 12px 20px; color: white; text-decoration: none; font-size: 14px; transition: 0.2s; }
+        .sidebar nav a i { margin-right: 12px; width: 20px; text-align: center; }
+        .sidebar nav a:hover { background-color: rgba(255,255,255,0.1); }
+        .sidebar nav a.active { background-color: #eceff1; color: #333; font-weight: 600; }
+        
+        .section-label { padding: 20px 20px 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #d1e3ff; }
+        
+        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
+        header { height: 50px; background-color: #343a40; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; }
+        .content-area { padding: 25px; }
+        
+        .page-title { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 25px; }
+        .page-title h1 { font-weight: 400; font-size: 28px; color: #444; }
+        .breadcrumb { font-size: 13px; color: #888; }
+        .breadcrumb span { color: #007bff; }
+        
+        .card { background: white; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.05); border-top: 3px solid #d2d6de; }
+        .card-header { padding: 15px; border-bottom: 1px solid #f4f4f4; display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 16px; color: #33
