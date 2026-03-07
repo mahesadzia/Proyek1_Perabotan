@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inventaris - Data Barang</title>
+    <title>Sistem Inventaris - Laporan Penjualan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
         body { display: flex; background-color: #f4f6f9; min-height: 100vh; overflow-x: hidden; }
         
-        /* SIDEBAR STYLING */
         .sidebar { width: 260px; background-color: #3b82f6; color: white; flex-shrink: 0; transition: all 0.3s; }
         .profile-box { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .avatar-circle { width: 65px; height: 65px; background: white; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #bdc3c7; font-size: 32px; }
@@ -22,7 +21,6 @@
         
         .section-label { padding: 20px 20px 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #d1e3ff; }
         
-        /* MAIN CONTENT STYLING */
         .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
         header { height: 50px; background-color: #343a40; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; }
         .content-area { padding: 25px; }
@@ -52,8 +50,9 @@
         .opsi-icons i:hover { color: #333; }
         
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .status-aktif { background-color: #d4edda; color: #155724; }
-        .status-habis { background-color: #f8d7da; color: #721c24; }
+        .status-lunas { background-color: #d4edda; color: #155724; }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-batal { background-color: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
@@ -65,21 +64,16 @@
         </div>
         
         <nav>
-            <!-- Link ke Dashboard -->
             <a href="index.html"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
-            
-            <!-- Link Inventory Barang (Active) -->
-            <a href="Barang.html" class="active"><i class="fa fa-box"></i> Inventory Barang</a>
+            <a href="Barang.html"><i class="fa fa-box"></i> Barang</a>
             
             <div class="section-label">Transaksi</div>
             <a href="#"><i class="fa fa-shopping-cart"></i> Pembelian</a>
             <a href="#"><i class="fa fa-file-invoice"></i> Penjualan</a>
             
             <div class="section-label">Report</div>
-            <!-- Link ke Laporan Pembelian -->
             <a href="LaporanPembelian.html"><i class="fa fa-file-invoice"></i> Laporan Pembelian</a>
-            <!-- Link ke Laporan Penjualan -->
-            <a href="LaporanPenjualan.html"><i class="fa fa-chart-bar"></i> Laporan Penjualan</a>
+            <a href="LaporanPenjualan.html" class="active"><i class="fa fa-chart-bar"></i> Laporan Penjualan</a>
         </nav>
     </aside>
 
@@ -93,14 +87,17 @@
 
         <section class="content-area">
             <div class="page-title">
-                <h1>Inventory Barang</h1>
-                <div class="breadcrumb">Home / <span>Inventory / Barang</span></div>
+                <h1>Laporan Penjualan</h1>
+                <div class="breadcrumb">Home / <span>Laporan / Penjualan</span></div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="fa fa-list"></i> Data Barang</h3>
-                    <button class="btn-blue" onclick="alert('Tambah Barang diklik!')">+ Add Barang</button>
+                    <h3><i class="fa fa-chart-bar"></i> Riwayat Penjualan</h3>
+                    <div>
+                        <button class="btn-blue" onclick="window.print()"><i class="fa fa-print"></i> Cetak</button>
+                        <button class="btn-blue" style="background-color: #28a745; margin-left: 5px;"><i class="fa fa-file-excel"></i> Excel</button>
+                    </div>
                 </div>
 
                 <div class="table-filter">
@@ -114,69 +111,69 @@
                         entries
                     </div>
                     <div>
-                        Search: <input type="text" placeholder="Cari barang...">
+                        Search: <input type="text" placeholder="Cari invoice atau pelanggan...">
                     </div>
                 </div>
 
                 <table>
                     <thead>
                         <tr>
-                            <th>ID Barang <i class="fa fa-sort"></i></th>
-                            <th>Nama Barang <i class="fa fa-sort"></i></th>
-                            <th>Harga Beli <i class="fa fa-sort"></i></th>
-                            <th>Harga Jual <i class="fa fa-sort"></i></th>
-                            <th>Stok <i class="fa fa-sort"></i></th>
-                            <th>Status <i class="fa fa-sort"></i></th>
-                            <th>Operasi <i class="fa fa-sort"></i></th>
+                            <th>No. Invoice</th>
+                            <th>Tanggal</th>
+                            <th>Pelanggan</th>
+                            <th>Item Terjual</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>BRG-001</td>
-                            <td>Ember Besar</td>
-                            <td>Rp 5.000</td>
-                            <td>Rp 7.000</td>
-                            <td>50</td>
-                            <td><span class="status-badge status-aktif">Aktif</span></td>
+                            <td>INV-JUAL-001</td>
+                            <td>2023-10-01</td>
+                            <td>Budi Santoso</td>
+                            <td>Ember Besar (2x)</td>
+                            <td>Rp 14.000</td>
+                            <td><span class="status-badge status-lunas">Lunas</span></td>
                             <td class="opsi-icons">
-                                <i class="fa fa-edit" title="Edit"></i>
-                                <i class="fa fa-trash" title="Hapus"></i>
+                                <i class="fa fa-eye" title="Detail"></i>
+                                <i class="fa fa-print" title="Cetak"></i>
                             </td>
                         </tr>
                         <tr>
-                            <td>BRG-002</td>
-                            <td>Blender 500W</td>
-                            <td>Rp 50.000</td>
-                            <td>Rp 100.000</td>
-                            <td>10</td>
-                            <td><span class="status-badge status-aktif">Aktif</span></td>
+                            <td>INV-JUAL-002</td>
+                            <td>2023-10-02</td>
+                            <td>Siti Aminah</td>
+                            <td>Blender (1x), Centong (5x)</td>
+                            <td>Rp 135.000</td>
+                            <td><span class="status-badge status-lunas">Lunas</span></td>
                             <td class="opsi-icons">
-                                <i class="fa fa-edit" title="Edit"></i>
-                                <i class="fa fa-trash" title="Hapus"></i>
+                                <i class="fa fa-eye" title="Detail"></i>
+                                <i class="fa fa-print" title="Cetak"></i>
                             </td>
                         </tr>
                         <tr>
-                            <td>BRG-003</td>
-                            <td>Centong Nasi</td>
-                            <td>Rp 3.000</td>
-                            <td>Rp 7.000</td>
-                            <td>100</td>
-                            <td><span class="status-badge status-aktif">Aktif</span></td>
+                            <td>INV-JUAL-003</td>
+                            <td>2023-10-03</td>
+                            <td>Toko Makmur</td>
+                            <td>Ember Besar (20x)</td>
+                            <td>Rp 140.000</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
                             <td class="opsi-icons">
-                                <i class="fa fa-edit" title="Edit"></i>
-                                <i class="fa fa-trash" title="Hapus"></i>
+                                <i class="fa fa-eye" title="Detail"></i>
+                                <i class="fa fa-print" title="Cetak"></i>
                             </td>
                         </tr>
                         <tr>
-                            <td>BRG-004</td>
-                            <td>Wajan Anti Lengket</td>
-                            <td>Rp 25.000</td>
-                            <td>Rp 45.000</td>
-                            <td>0</td>
-                            <td><span class="status-badge status-habis">Habis</span></td>
+                            <td>INV-JUAL-004</td>
+                            <td>2023-10-04</td>
+                            <td>Andi Wijaya</td>
+                            <td>Centong Nasi (10x)</td>
+                            <td>Rp 70.000</td>
+                            <td><span class="status-badge status-batal">Batal</span></td>
                             <td class="opsi-icons">
-                                <i class="fa fa-edit" title="Edit"></i>
-                                <i class="fa fa-trash" title="Hapus"></i>
+                                <i class="fa fa-eye" title="Detail"></i>
+                                <i class="fa fa-print" title="Cetak"></i>
                             </td>
                         </tr>
                     </tbody>

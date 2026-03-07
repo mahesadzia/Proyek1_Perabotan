@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembelian Barang - Sistem Inventori</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; background-color: #f4f4f4; height: 100vh; overflow: hidden; }
+        .sidebar { width: 250px; background-color: #337ab7; color: #fff; padding: 20px; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; }
+        .admin-profile { display: flex; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .admin-profile i { font-size: 3rem; margin-right: 15px; color: rgba(255,255,255,0.8); }
+        .sidebar-menu { flex: 1; overflow-y: auto; }
+        .sidebar a { display: block; color: #fff; text-decoration: none; padding: 12px 10px; border-radius: 4px; transition: background-color 0.3s; display: flex; align-items: center; }
+        .sidebar a i { margin-right: 10px; width: 20px; text-align: center; font-size: 1.1rem; }
+        .sidebar a:hover, .sidebar a.active { background-color: rgba(255, 255, 255, 0.1); }
+        .sidebar h3 { margin-top: 25px; margin-bottom: 10px; font-size: 0.8rem; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); letter-spacing: 1px; padding-left: 10px; }
+        .main-content { flex: 1; padding: 25px; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .header h2 { margin: 0; font-weight: 400; color: #333; }
+        .user-info { display: flex; align-items: center; gap: 10px; color: #666; font-size: 0.9rem; }
+        .user-info i { font-size: 1.5rem; color: #ccc; }
+        .info-panel { background-color: #fff; padding: 25px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .info-panel h3 { margin-top: 0; margin-bottom: 20px; font-weight: 400; color: #555; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.1rem; }
+        .info-panel h3 i { margin-right: 10px; color: #337ab7; }
+        .form-panel form { display: flex; flex-direction: column; gap: 15px; }
+        .form-row { display: flex; gap: 20px; }
+        .form-row.three-cols .form-group { flex: 1; }
+        .form-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.85rem; color: #777; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select { padding: 11px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.95rem; color: #333; }
+        .form-group input[readonly] { background-color: #f9f9f9; cursor: not-allowed; color: #888; border-color: #eee; }
+        .form-group input:focus, .form-group select:focus { border-color: #337ab7; outline: none; box-shadow: 0 0 0 3px rgba(51, 122, 183, 0.1); }
+        .form-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.95rem; font-weight: 600; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; gap: 8px; }
+        .btn:active { transform: translateY(1px); }
+        .btn-primary { background-color: #337ab7; color: white; }
+        .btn-primary:hover { background-color: #286090; }
+        .btn-secondary { background-color: #eee; color: #555; }
+        .btn-secondary:hover { background-color: #e0e0e0; color: #333; }
+        .table-panel { padding: 20px; }
+        .table-container { overflow-x: auto; margin-top: 10px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; color: #444; min-width: 800px; }
+        .data-table thead { background-color: #fcfcfc; }
+        .data-table th, .data-table td { text-align: left; padding: 14px 15px; border-bottom: 1px solid #eee; }
+        .data-table th { font-weight: 600; color: #666; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+        .data-table td { vertical-align: middle; }
+        .data-table tbody tr:hover { background-color: #fafafa; }
+        .data-table td.qty-col, .data-table th.qty-col { text-align: center; }
+        .data-table td.amount-col, .data-table th.amount-col { text-align: right; }
+        .action-cols { display: flex; gap: 6px; justify-content: center; }
+        .btn-icon { background: none; border: 1px solid transparent; cursor: pointer; font-size: 1rem; padding: 6px; border-radius: 4px; transition: all 0.2s; color: #888; }
+        .btn-edit:hover { color: #f0ad4e; background-color: rgba(240, 173, 78, 0.1); border-color: rgba(240, 173, 78, 0.2); }
+        .btn-delete:hover { color: #d9534f; background-color: rgba(217, 83, 79, 0.1); border-color: rgba(217, 83, 79, 0.2); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #aaa; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="admin-profile">
+            <i class="fas fa-user-circle"></i>
+            <span>Admin</span>
+        </div>
+        <div class="sidebar-menu">
+            <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#"><i class="fas fa-boxes-stacked"></i> Inventori</a>
+            <h3>Transaksi</h3>
+            <a href="#" class="active"><i class="fas fa-shopping-cart"></i> Pembelian</a>
+            <a href="#"><i class="fas fa-file-invoice"></i> Penjualan</a>
+            <h3>Report</h3>
+            <a href="#"><i class="fas fa-chart-line"></i> Laporan Pembelian</a>
+            <a href="#"><i class="fas fa-chart-bar"></i> Laporan Penjualan</a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <h2>Transaksi Pembelian</h2>
+            <div class="user-info">
+                <span>admin</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+        <div class="info-panel form-panel">
+            <h3><i class="fas fa-plus-circle"></i> Tambah Pembelian Baru</h3>
+            <form action="#" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tgl_beli">Tanggal</label>
+                        <input type="date" id="tgl_beli" name="tgl_beli" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="no_faktur">No. Faktur</label>
+                        <input type="text" id="no_faktur" name="no_faktur" placeholder="Contoh: FKT-001" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nama_barang">Nama Barang</label>
+                        <select id="nama_barang" name="nama_barang" required>
+                            <option value="" disabled selected>Pilih Barang</option>
+                            <option value="ember_besar">Ember besar</option>
+                            <option value="blender">Blender</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplier">Supplier</label>
+                        <select id="supplier" name="supplier" required>
+                            <option value="" disabled selected>Pilih Supplier</option>
+                            <option value="sup_jaya">PT. Jaya Abadi</option>
+                            <option value="sup_makmur">UD. Makmur Sentosa</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row three-cols">
+                    <div class="form-group">
+                        <label for="jumlah">Jumlah (Qty)</label>
+                        <input type="number" id="jumlah" name="jumlah" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="harga_satuan">Harga Satuan (Rp)</label>
+                        <input type="number" id="harga_satuan" name="harga_satuan" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="total_harga">Total Harga (Rp)</label>
+                        <input type="number" id="total_harga" name="total_harga" readonly placeholder="Otomatis">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="reset" class="btn btn-secondary"><i class="fas fa-undo"></i> Reset</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Transaksi</button>
+                </div>
+            </form>
+        </div>
+        <div class="info-panel table-panel">
+            <h3><i class="fas fa-history"></i> Riwayat Pembelian Terbaru</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Tanggal</th>
+                            <th>No. Faktur</th>
+                            <th>Nama Barang</th>
+                            <th>Supplier</th>
+                            <th class="qty-col">Jumlah</th>
+                            <th class="amount-col">Harga Satuan</th>
+                            <th class="amount-col">Total</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>2023-10-26</td>
+                            <td>FKT-001</td>
+                            <td>Ember besar</td>
+                            <td>PT. Jaya Abadi</td>
+                            <td class="qty-col">50</td>
+                            <td class="amount-col">10.000</td>
+                            <td class="amount-col">500.000</td>
+                            <td class="action-cols">
+                                <button class="btn-icon btn-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon btn-delete" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>2023-10-25</td>
+                            <td>FKT-002</td>
+                            <td>Blender</td>
+                            <td>UD. Makmur Sentosa</td>
+                            <td class="qty-col">20</td>
+                            <td class="amount-col">25.000</td>
+                            <td class="amount-col">500.000</td>
+                            <td class="action-cols">
+                                <button class="btn-icon btn-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon btn-delete" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        const jumlahInput = document.getElementById('jumlah');
+        const hargaSatuanInput = document.getElementById('harga_satuan');
+        const totalHargaInput = document.getElementById('total_harga');
+        function hitungTotal() {
+            const jumlah = parseFloat(jumlahInput.value) || 0;
+            const hargaSatuan = parseFloat(hargaSatuanInput.value) || 0;
+            totalHargaInput.value = (jumlah * hargaSatuan).toFixed(0);
+        }
+        jumlahInput.addEventListener('input', hitungTotal);
+        hargaSatuanInput.addEventListener('input', hitungTotal);
+    </script>
+</body>
+</html>
