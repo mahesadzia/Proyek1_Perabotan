@@ -3,55 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inventaris - Laporan Pembelian</title>
+    <title>Laporan Pembelian</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        /* --- Reset Global --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { display: flex; background-color: #f4f6f9; min-height: 100vh; overflow-x: hidden; }
         
-        .sidebar { width: 260px; background-color: #3b82f6; color: white; flex-shrink: 0; transition: all 0.3s; }
-        .profile-box { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .avatar-circle { width: 65px; height: 65px; background: white; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #bdc3c7; font-size: 32px; }
+        /* --- GAYA SIDEBAR BARU (DISESUAIKAN DENGAN GAMBAR) --- */
+        .sidebar { 
+            width: 260px; 
+            background-color: #337ab7; /* Biru langit AdminLTE standard */
+            color: #fff; 
+            flex-shrink: 0; 
+            transition: all 0.3s; 
+            box-sizing: border-box; 
+        }
+
+        .profile-box { 
+            padding: 30px 20px; 
+            text-align: center; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
+
+        .avatar-circle { 
+            width: 70px; 
+            height: 70px; 
+            background: rgba(255,255,255,0.2); /* Sedikit transparan */
+            border-radius: 50%; 
+            margin: 0 auto 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: rgba(255,255,255,0.7); 
+            font-size: 36px; 
+        }
         
-        .sidebar nav a { display: flex; align-items: center; padding: 12px 20px; color: white; text-decoration: none; font-size: 14px; transition: 0.2s; }
-        .sidebar nav a i { margin-right: 12px; width: 20px; text-align: center; }
-        .sidebar nav a:hover { background-color: rgba(255,255,255,0.1); }
-        .sidebar nav a.active { background-color: #eceff1; color: #333; font-weight: 600; }
+        .profile-box p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
         
-        .section-label { padding: 20px 20px 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #d1e3ff; }
+        .sidebar nav {
+            padding: 10px 0;
+        }
+
+        .sidebar nav a { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 20px; 
+            color: rgba(255,255,255,0.8); /* Putih pudar */
+            text-decoration: none; 
+            font-size: 15px; 
+            transition: 0.2s; 
+        }
+
+        .sidebar nav a i { 
+            margin-right: 15px; 
+            width: 20px; 
+            text-align: center; 
+            font-size: 1.1rem;
+        }
+
+        /* Hover effect biru tua gelap */
+        .sidebar nav a:hover { 
+            background-color: rgba(0,0,0,0.1); 
+            color: #fff;
+        }
+
+        /* Active state: teks biru di atas latar belakang putih/abu pudar */
+        .sidebar nav a.active { 
+            background-color: #eceff1; 
+            color: #337ab7; 
+            font-weight: 600; 
+        }
         
+        .sidebar nav a.active i {
+            color: #337ab7;
+        }
+        
+        /* Label section (TRANSAKSI, REPORT) */
+        .section-label { 
+            padding: 25px 20px 8px; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1.2px; 
+            color: rgba(255,255,255,0.5); /* Putih sangat pudar */
+            font-weight: 600;
+        }
+        
+        /* --- MAIN CONTENT STYLING (TETAP SAMA) --- */
         .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
-        header { height: 50px; background-color: #343a40; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; }
-        .content-area { padding: 25px; }
         
-        .page-title { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 25px; }
-        .page-title h1 { font-weight: 400; font-size: 28px; color: #444; }
-        .breadcrumb { font-size: 13px; color: #888; }
-        .breadcrumb span { color: #007bff; }
+        header { 
+            height: 55px; 
+            background-color: #fff; /* Header putih */
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 25px; 
+            color: #555; 
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
         
-        .card { background: white; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.05); border-top: 3px solid #d2d6de; }
-        .card-header { padding: 15px; border-bottom: 1px solid #f4f4f4; display: flex; justify-content: space-between; align-items: center; }
-        .card-header h3 { font-size: 16px; color: #333; display: flex; align-items: center; gap: 8px; }
+        header i.fa-bars {
+            font-size: 1.2rem;
+            color: #888;
+        }
         
-        .btn-blue { background-color: #3c8dbc; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 13px; }
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+        
+        .header-user-info i.fa-user-circle {
+            font-size: 1.4rem;
+            color: #ccc;
+        }
+        
+        .header-user-info i.fa-caret-down {
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        .content-area { padding: 30px; }
+        
+        .page-title { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 30px; }
+        .page-title h1 { font-weight: 400; font-size: 30px; color: #444; }
+        
+        .breadcrumb { font-size: 14px; color: #888; }
+        .breadcrumb a { color: #888; text-decoration: none; }
+        .breadcrumb a:hover { color: #337ab7; text-decoration: underline; }
+        .breadcrumb span { color: #555; font-weight: 500; }
+        
+        .card { 
+            background: white; 
+            border-radius: 5px; 
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1); 
+            border-top: 3px solid #d2d6de; /* Garis abu-abu atas */
+            overflow: hidden;
+        }
+
+        .card-header { 
+            padding: 15px 20px; 
+            border-bottom: 1px solid #f4f4f4; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        .card-header h3 { font-size: 17px; color: #333; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .card-header h3 i { color: #337ab7; }
+        
+        .btn-blue { 
+            background-color: #3c8dbc; 
+            color: white; 
+            border: none; 
+            padding: 7px 15px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 500;
+            transition: 0.1s;
+        }
+
         .btn-blue:hover { background-color: #367fa9; }
         
-        .table-filter { padding: 15px; display: flex; justify-content: space-between; font-size: 13px; }
-        .table-filter input, .table-filter select { border: 1px solid #ccc; padding: 4px 8px; outline: none; }
+        .table-filter { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #666; }
+        .table-filter-group { display: flex; align-items: center; gap: 8px; }
+        .table-filter input, .table-filter select { border: 1px solid #ccc; padding: 6px 12px; outline: none; border-radius: 3px; }
         
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px 15px; border-bottom: 2px solid #f4f4f4; font-size: 14px; color: #333; cursor: pointer; }
-        th i { font-size: 11px; color: #ccc; margin-left: 5px; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f4f4f4; font-size: 14px; color: #555; }
-        tr:hover { background-color: #f9f9f9; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid #f4f4f4; font-size: 15px; color: #444; cursor: pointer; font-weight: 600; white-space: nowrap;}
+        th i { font-size: 12px; color: #bbb; margin-left: 8px; }
         
-        .opsi-icons i { margin-right: 10px; cursor: pointer; color: #777; }
+        td { padding: 15px; border-bottom: 1px solid #f4f4f4; font-size: 15px; color: #555; vertical-align: middle; }
+        tr:hover td { background-color: #fcfcfc; }
+        
+        .opsi-icons i { margin-right: 12px; cursor: pointer; color: #777; font-size: 1.1rem;}
         .opsi-icons i:hover { color: #333; }
         
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .status-sukses { background-color: #d4edda; color: #155724; }
-        .status-warning { background-color: #fff3cd; color: #856404; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-sukses { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+        .status-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
     </style>
 </head>
 <body>
@@ -59,19 +198,20 @@
     <aside class="sidebar">
         <div class="profile-box">
             <div class="avatar-circle"><i class="fa fa-user"></i></div>
-            <p>Admin</p>
+            <p>Admin Perabotan</p>
         </div>
         
         <nav>
             <a href="index.html"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
-            <a href="Barang.html"><i class="fa fa-box"></i> Barang</a>
+            
+            <a href="Barang.html"><i class="fa fa-box"></i> Inventori</a>
             
             <div class="section-label">Transaksi</div>
             <a href="#"><i class="fa fa-shopping-cart"></i> Pembelian</a>
             <a href="#"><i class="fa fa-file-invoice"></i> Penjualan</a>
             
             <div class="section-label">Report</div>
-            <a href="LaporanPembelian.html" class="active"><i class="fa fa-file-invoice"></i> Laporan Pembelian</a>
+            <a href="LaporanPembelian.html" class="active"><i class="fa fa-chart-line"></i> Laporan Pembelian</a>
             <a href="LaporanPenjualan.html"><i class="fa fa-chart-bar"></i> Laporan Penjualan</a>
         </nav>
     </aside>
@@ -79,15 +219,15 @@
     <div class="main-wrapper">
         <header>
             <i class="fa fa-bars" style="cursor: pointer;"></i>
-            <div style="font-size: 14px;">
-                admin <i class="fa fa-user-circle" style="margin: 0 5px;"></i> <i class="fa fa-caret-down"></i>
+            <div class="header-user-info">
+                <span>admin perabotan</span> <i class="fa fa-user-circle"></i> <i class="fa fa-caret-down"></i>
             </div>
         </header>
 
         <section class="content-area">
             <div class="page-title">
                 <h1>Laporan Pembelian</h1>
-                <div class="breadcrumb">Home / <span>Laporan / Pembelian</span></div>
+                <div class="breadcrumb">Home / Laporan / <span>Laporan Pembelian</span></div>
             </div>
 
             <div class="card">
@@ -97,7 +237,7 @@
                 </div>
 
                 <div class="table-filter">
-                    <div>
+                    <div class="table-filter-group">
                         Show 
                         <select>
                             <option>10</option>
@@ -106,7 +246,7 @@
                         </select> 
                         entries
                     </div>
-                    <div>
+                    <div class="table-filter-group">
                         Search: <input type="text" placeholder="Cari supplier atau item...">
                     </div>
                 </div>
