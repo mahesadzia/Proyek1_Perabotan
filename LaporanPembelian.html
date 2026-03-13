@@ -7,11 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* --- Reset Global --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { display: flex; background-color: #f4f6f9; min-height: 100vh; overflow-x: hidden; }
         
-        /* --- GAYA SIDEBAR BARU (DISESUAIKAN DENGAN GAMBAR) --- */
         .sidebar { 
             width: 260px; 
             background-color: #337ab7; /* Biru langit AdminLTE standard */
@@ -67,13 +65,11 @@
             font-size: 1.1rem;
         }
 
-        /* Hover effect biru tua gelap */
         .sidebar nav a:hover { 
             background-color: rgba(0,0,0,0.1); 
             color: #fff;
         }
 
-        /* Active state: teks biru di atas latar belakang putih/abu pudar */
         .sidebar nav a.active { 
             background-color: #eceff1; 
             color: #337ab7; 
@@ -84,7 +80,6 @@
             color: #337ab7;
         }
         
-        /* Label section (TRANSAKSI, REPORT) */
         .section-label { 
             padding: 25px 20px 8px; 
             font-size: 0.8rem; 
@@ -94,7 +89,6 @@
             font-weight: 600;
         }
         
-        /* --- MAIN CONTENT STYLING (TETAP SAMA) --- */
         .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
         
         header { 
@@ -202,13 +196,13 @@
         </div>
         
         <nav>
-            <a href="index.html"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+            <a href="Dashboard.html"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
             
-            <a href="Barang.html"><i class="fa fa-box"></i> Inventori</a>
+            <a href="inventoriBarang.html"><i class="fa fa-box"></i> Inventori</a>
             
             <div class="section-label">Transaksi</div>
-            <a href="#"><i class="fa fa-shopping-cart"></i> Pembelian</a>
-            <a href="#"><i class="fa fa-file-invoice"></i> Penjualan</a>
+            <a href="Pembelian"><i class="fa fa-shopping-cart"></i> Pembelian</a>
+            <a href="Penjalan"><i class="fa fa-file-invoice"></i> Penjualan</a>
             
             <div class="section-label">Report</div>
             <a href="LaporanPembelian.html" class="active"><i class="fa fa-chart-line"></i> Laporan Pembelian</a>
