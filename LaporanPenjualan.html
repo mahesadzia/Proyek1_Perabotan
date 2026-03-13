@@ -3,52 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inventaris - Laporan Penjualan</title>
+    <title>Laporan Penjualan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { display: flex; background-color: #f4f6f9; min-height: 100vh; overflow-x: hidden; }
-        
-        .sidebar { width: 260px; background-color: #3b82f6; color: white; flex-shrink: 0; transition: all 0.3s; }
-        .profile-box { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .avatar-circle { width: 65px; height: 65px; background: white; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #bdc3c7; font-size: 32px; }
-        
-        .sidebar nav a { display: flex; align-items: center; padding: 12px 20px; color: white; text-decoration: none; font-size: 14px; transition: 0.2s; }
-        .sidebar nav a i { margin-right: 12px; width: 20px; text-align: center; }
-        .sidebar nav a:hover { background-color: rgba(255,255,255,0.1); }
-        .sidebar nav a.active { background-color: #eceff1; color: #333; font-weight: 600; }
-        
-        .section-label { padding: 20px 20px 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #d1e3ff; }
-        
-        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
-        header { height: 50px; background-color: #343a40; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; }
-        .content-area { padding: 25px; }
-        
-        .page-title { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 25px; }
-        .page-title h1 { font-weight: 400; font-size: 28px; color: #444; }
-        .breadcrumb { font-size: 13px; color: #888; }
-        .breadcrumb span { color: #007bff; }
-        
-        .card { background: white; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.05); border-top: 3px solid #d2d6de; }
-        .card-header { padding: 15px; border-bottom: 1px solid #f4f4f4; display: flex; justify-content: space-between; align-items: center; }
-        .card-header h3 { font-size: 16px; color: #333; display: flex; align-items: center; gap: 8px; }
-        
-        .btn-blue { background-color: #3c8dbc; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 13px; }
-        .btn-blue:hover { background-color: #367fa9; }
-        
-        .table-filter { padding: 15px; display: flex; justify-content: space-between; font-size: 13px; }
-        .table-filter input, .table-filter select { border: 1px solid #ccc; padding: 4px 8px; outline: none; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px 15px; border-bottom: 2px solid #f4f4f4; font-size: 14px; color: #333; cursor: pointer; }
-        th i { font-size: 11px; color: #ccc; margin-left: 5px; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f4f4f4; font-size: 14px; color: #555; }
-        tr:hover { background-color: #f9f9f9; }
-        
-        .opsi-icons i { margin-right: 10px; cursor: pointer; color: #777; }
-        .opsi-icons i:hover { color: #333; }
-        
+        /* --- Reset Global --- */
+        body { font-family: 'Segoe UI', serif; margin: 0; display: flex; background-color: #f4f4f4; height: 100vh; overflow: hidden; }
+        .sidebar { width: 250px; background-color: #337ab7; color: #fff; padding: 20px; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; }
+        .admin-profile { display: flex; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .admin-profile i { font-size: 3rem; margin-right: 15px; color: rgba(255,255,255,0.8); }
+        .sidebar-menu { flex: 1; overflow-y: auto; }
+        .sidebar a { display: block; color: #fff; text-decoration: none; padding: 12px 10px; border-radius: 4px; transition: background-color 0.3s; display: flex; align-items: center; }
+        .sidebar a i { margin-right: 10px; width: 20px; text-align: center; font-size: 1.1rem; }
+        .sidebar a:hover, .sidebar a.active { background-color: rgba(255, 255, 255, 0.1); }
+        .sidebar h3 { margin-top: 25px; margin-bottom: 10px; font-size: 0.8rem; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); letter-spacing: 1px; padding-left: 10px; }
+        .main-content { flex: 1; padding: 25px; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .header h2 { margin: 0; font-weight: 400; color: #333; }
+        .user-info { display: flex; align-items: center; gap: 10px; color: #666; font-size: 0.9rem; }
+        .user-info i { font-size: 1.5rem; color: #ccc; }
+        .info-panel { background-color: #fff; padding: 25px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .info-panel h3 { margin-top: 0; margin-bottom: 20px; font-weight: 400; color: #555; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.1rem; }
+        .info-panel h3 i { margin-right: 10px; color: #337ab7; }
+        .form-panel form { display: flex; flex-direction: column; gap: 15px; }
+        .form-row { display: flex; gap: 20px; }
+        .form-row.three-cols .form-group { flex: 1; }
+        .form-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.85rem; color: #777; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select { padding: 11px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.95rem; color: #333; }
+        .form-group input[readonly] { background-color: #f9f9f9; cursor: not-allowed; color: #888; border-color: #eee; }
+        .form-group input:focus, .form-group select:focus { border-color: #337ab7; outline: none; box-shadow: 0 0 0 3px rgba(51, 122, 183, 0.1); }
+        .form-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.95rem; font-weight: 600; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; gap: 8px; }
+        .btn:active { transform: translateY(1px); }
+        .btn-primary { background-color: #337ab7; color: white; }
+        .btn-primary:hover { background-color: #286090; }
+        .btn-secondary { background-color: #eee; color: #555; }
+        .btn-secondary:hover { background-color: #e0e0e0; color: #333; }
+        .table-panel { padding: 20px; }
+        .table-container { overflow-x: auto; margin-top: 10px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; color: #444; min-width: 800px; }
+        .data-table thead { background-color: #fcfcfc; }
+        .data-table th, .data-table td { text-align: left; padding: 14px 15px; border-bottom: 1px solid #eee; }
+        .data-table th { font-weight: 600; color: #666; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+        .data-table td { vertical-align: middle; }
+        .data-table tbody tr:hover { background-color: #fafafa; }
+        .data-table td.qty-col, .data-table th.qty-col { text-align: center; }
+        .data-table td.amount-col, .data-table th.amount-col { text-align: right; }
+        .action-cols { display: flex; gap: 6px; justify-content: center; }
+        .btn-icon { background: none; border: 1px solid transparent; cursor: pointer; font-size: 1rem; padding: 6px; border-radius: 4px; transition: all 0.2s; color: #888; }
+        .btn-edit:hover { color: #f0ad4e; background-color: rgba(240, 173, 78, 0.1); border-color: rgba(240, 173, 78, 0.2); }
+        .btn-delete:hover { color: #d9534f; background-color: rgba(217, 83, 79, 0.1); border-color: rgba(217, 83, 79, 0.2); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #aaa; }
+        .card-header button { padding: 6px 12px; border: none; border-radius: 3px; cursor: pointer; font-size: 13px; color: white; background-color: #3c8dbc; transition: background-color 0.2s; }
+        .card-header button:hover { background-color: #367fa9; }
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
         .status-lunas { background-color: #d4edda; color: #155724; }
         .status-pending { background-color: #fff3cd; color: #856404; }
@@ -56,73 +67,49 @@
     </style>
 </head>
 <body>
-
-    <aside class="sidebar">
-        <div class="profile-box">
-            <div class="avatar-circle"><i class="fa fa-user"></i></div>
-            <p>Admin</p>
+    <div class="sidebar">
+        <div class="admin-profile">
+            <i class="fas fa-user-circle"></i>
+            <span>Admin</span>
         </div>
-        
-        <nav>
-            <a href="index.html"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
-            <a href="Barang.html"><i class="fa fa-box"></i> Barang</a>
-            
-            <div class="section-label">Transaksi</div>
-            <a href="#"><i class="fa fa-shopping-cart"></i> Pembelian</a>
-            <a href="#"><i class="fa fa-file-invoice"></i> Penjualan</a>
-            
-            <div class="section-label">Report</div>
-            <a href="LaporanPembelian.html"><i class="fa fa-file-invoice"></i> Laporan Pembelian</a>
-            <a href="LaporanPenjualan.html" class="active"><i class="fa fa-chart-bar"></i> Laporan Penjualan</a>
-        </nav>
-    </aside>
-
-    <div class="main-wrapper">
-        <header>
-            <i class="fa fa-bars" style="cursor: pointer;"></i>
-            <div style="font-size: 14px;">
-                admin <i class="fa fa-user-circle" style="margin: 0 5px;"></i> <i class="fa fa-caret-down"></i>
+        <div class="sidebar-menu">
+            <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#"><i class="fas fa-boxes-stacked"></i> Inventori</a>
+            <h3>Transaksi</h3>
+            <a href="#"><i class="fas fa-shopping-cart"></i> Pembelian</a>
+            <a href="#"><i class="fas fa-file-invoice"></i> Penjualan</a>
+            <h3>Report</h3>
+            <a href="#"><i class="fas fa-chart-line"></i> Laporan Pembelian</a>
+            <a href="#" class="active"><i class="fas fa-chart-bar"></i> Laporan Penjualan</a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <h2>Halaman Laporan Penjualan</h2>
+            <div class="user-info">
+                <span>admin perabotan</span>
+                <i class="fas fa-user-circle"></i>
             </div>
-        </header>
-
-        <section class="content-area">
-            <div class="page-title">
-                <h1>Laporan Penjualan</h1>
-                <div class="breadcrumb">Home / <span>Laporan / Penjualan</span></div>
+        </div>
+        <div class="info-panel table-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                <h3><i class="fas fa-chart-bar"></i> Riwayat Penjualan</h3>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn btn-primary" onclick="window.print()"><i class="fa fa-print"></i> Cetak</button>
+                    <button class="btn" style="background-color: #28a745; color: white;"><i class="fa fa-file-excel"></i> Excel</button>
+                </div>
             </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fa fa-chart-bar"></i> Riwayat Penjualan</h3>
-                    <div>
-                        <button class="btn-blue" onclick="window.print()"><i class="fa fa-print"></i> Cetak</button>
-                        <button class="btn-blue" style="background-color: #28a745; margin-left: 5px;"><i class="fa fa-file-excel"></i> Excel</button>
-                    </div>
-                </div>
-
-                <div class="table-filter">
-                    <div>
-                        Show 
-                        <select>
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option>
-                        </select> 
-                        entries
-                    </div>
-                    <div>
-                        Search: <input type="text" placeholder="Cari invoice atau pelanggan...">
-                    </div>
-                </div>
-
-                <table>
+            <div class="table-container">
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th>No. Invoice</th>
                             <th>Tanggal</th>
                             <th>Pelanggan</th>
-                            <th>Item Terjual</th>
-                            <th>Total</th>
+                            <th>Item Jual</th>
+                            <th class="qty-col">Jumlah</th>
+                            <th class="amount-col">Harga Satuan</th>
+                            <th class="amount-col">Total</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -132,55 +119,58 @@
                             <td>INV-JUAL-001</td>
                             <td>2023-10-01</td>
                             <td>Budi Santoso</td>
-                            <td>Ember Besar (2x)</td>
-                            <td>Rp 14.000</td>
+                            <td>Ember Besar</td>
+                            <td class="qty-col">2</td>
+                            <td class="amount-col">7.000</td>
+                            <td class="amount-col">14.000</td>
                             <td><span class="status-badge status-lunas">Lunas</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
+                            <td class="action-cols">
+                                <button class="btn-icon" title="Detail"><i class="fa fa-eye"></i></button>
                             </td>
                         </tr>
                         <tr>
                             <td>INV-JUAL-002</td>
                             <td>2023-10-02</td>
                             <td>Siti Aminah</td>
-                            <td>Blender (1x), Centong (5x)</td>
-                            <td>Rp 135.000</td>
+                            <td>Centong Kayu</td>
+                            <td class="qty-col">5</td>
+                            <td class="amount-col">3.000</td>
+                            <td class="amount-col">15.000</td>
                             <td><span class="status-badge status-lunas">Lunas</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
+                            <td class="action-cols">
+                                <button class="btn-icon" title="Detail"><i class="fa fa-eye"></i></button>
                             </td>
                         </tr>
                         <tr>
                             <td>INV-JUAL-003</td>
                             <td>2023-10-03</td>
                             <td>Toko Makmur</td>
-                            <td>Ember Besar (20x)</td>
-                            <td>Rp 140.000</td>
+                            <td>Panci Keramik</td>
+                            <td class="qty-col">1</td>
+                            <td class="amount-col">120.000</td>
+                            <td class="amount-col">120.000</td>
                             <td><span class="status-badge status-pending">Pending</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
+                            <td class="action-cols">
+                                <button class="btn-icon" title="Detail"><i class="fa fa-eye"></i></button>
                             </td>
                         </tr>
                         <tr>
                             <td>INV-JUAL-004</td>
                             <td>2023-10-04</td>
                             <td>Andi Wijaya</td>
-                            <td>Centong Nasi (10x)</td>
-                            <td>Rp 70.000</td>
+                            <td>Blender Portable</td>
+                            <td class="qty-col">1</td>
+                            <td class="amount-col">100.000</td>
+                            <td class="amount-col">100.000</td>
                             <td><span class="status-badge status-batal">Batal</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
+                            <td class="action-cols">
+                                <button class="btn-icon" title="Detail"><i class="fa fa-eye"></i></button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
     </div>
-
 </body>
 </html>
