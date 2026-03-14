@@ -7,15 +7,63 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Segoe UI', serif; margin: 0; display: flex; background-color: #f4f4f4; height: 100vh; overflow: hidden; }
-        .sidebar { width: 250px; background-color: #337ab7; color: #fff; padding: 20px; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; }
-        .admin-profile { display: flex; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .admin-profile i { font-size: 3rem; margin-right: 15px; color: rgba(255,255,255,0.8); }
-        .sidebar-menu { flex: 1; overflow-y: auto; }
-        .sidebar a { display: block; color: #fff; text-decoration: none; padding: 12px 10px; border-radius: 4px; transition: background-color 0.3s; display: flex; align-items: center; }
-        .sidebar a i { margin-right: 10px; width: 20px; text-align: center; font-size: 1.1rem; }
-        .sidebar a:hover, .sidebar a.active { background-color: rgba(255, 255, 255, 0.1); }
-        .sidebar h3 { margin-top: 25px; margin-bottom: 10px; font-size: 0.8rem; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); letter-spacing: 1px; padding-left: 10px; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #337ab7;
+            color: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .admin-profile i {
+            font-size: 3rem;
+            margin-right: 15px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a i:first-child {
+            width: 25px;
+            margin-right: 10px;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar h3 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.6);
+        }
         .main-content { flex: 1; padding: 25px; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
         .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         .header h2 { margin: 0; font-weight: 400; color: #333; }
@@ -72,14 +120,16 @@
             <span>Admin</span>
         </div>
         <div class="sidebar-menu">
-            <a href="Dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="inventoriBarang.html"><i class="fas fa-boxes-stacked"></i> Inventori</a>
-            <h3>Transaksi</h3>
-            <a href="Pembelian.html"><i class="fas fa-shopping-cart"></i> Pembelian</a>
-            <a href="Penjualan.html"><i class="fas fa-file-invoice"></i> Penjualan</a>
-            <h3>Report</h3>
-            <a href="LaporanPembelian.html"><i class="fas fa-chart-line"></i> Laporan Pembelian</a>
-            <a href="LaporanPenjualan.html" class="active"><i class="fas fa-chart-bar"></i> Laporan Penjualan</a>
+        <a href="Dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="inventoriBarang.html"><i class="fas fa-boxes-stacked"></i> Inventori</a>
+        
+        <h3>Transaksi</h3>
+        <a href="Pembelian.html"><i class="fas fa-shopping-cart"></i> Pembelian</a>
+        <a href="Penjualan.html"><i class="fas fa-file-invoice"></i> Penjualan</a>
+        
+        <h3>Report</h3>
+        <a href="LaporanPembelian.html"><i class="fas fa-chart-line"></i> Laporan Pembelian</a>
+        <a href="LaporanPenjualan.html"><i class="fas fa-chart-bar"></i> Laporan Penjualan</a>
         </div>
     </div>
     <div class="main-content">
