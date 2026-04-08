@@ -1,4 +1,3 @@
-/* Reset & Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -11,14 +10,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: url('gudang.png'); /* Pastikan file ada atau ganti URL */
+    background-image: url('gudang.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
 }
 
-/* Dark Overlay agar teks mudah dibaca */
 body::before {
     content: "";
     position: absolute;
@@ -29,16 +27,15 @@ body::before {
 
 .login-container {
     position: relative;
-    z-index: 2;
-    width: 100%;
-    max-width: 400px;
-    background-color: rgba(255, 255, 255, 0.12);
+    z-index: 2; 
+    width: 420px;
+    max-width: 90vw;
+    background-color: rgba(255, 255, 255, 0.15); 
     padding: 40px;
     border-radius: 20px;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px); /* Support Safari */
+    backdrop-filter: blur(15px); 
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2); 
     text-align: center;
 }
 
@@ -46,89 +43,114 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 35px;
+    gap: 12px;
+    margin-bottom: 30px;
 }
 
 .logo-section img {
-    height: 45px;
+    height: 45px; 
 }
 
 .logo-section h1 {
     color: #00BFFF;
-    font-size: 2.2rem;
-    font-weight: 800;
-    letter-spacing: 2px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Grouping Input */
+.error-message {
+    background: rgba(220, 53, 69, 0.2);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border-left: 4px solid #dc3545;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+}
+
+.error-message a {
+    color: #00BFFF;
+    text-decoration: none;
+}
+
+.error-message a:hover {
+    text-decoration: underline;
+}
+
 .input-group {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
-.input-group i:not(.toggle-password) {
+.input-group i {
     position: absolute;
-    left: 18px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
     color: rgba(255, 255, 255, 0.8);
-    font-size: 1rem;
-    pointer-events: none; /* Klik akan tembus ke input di bawahnya */
+    font-size: 1.1rem;
+    z-index: 2;
 }
 
 .input-group input {
     width: 100%;
-    /* Padding kiri & kanan diperbesar agar teks tidak menabrak ikon */
-    padding: 14px 50px 14px 50px; 
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
-    border-radius: 30px;
+    padding: 14px 16px 14px 48px; 
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
     color: #fff;
     font-size: 1rem;
     outline: none;
     transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
 }
 
 .input-group input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .input-group input:focus {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.25);
     border-color: #00BFFF;
-    box-shadow: 0 0 12px rgba(0, 191, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.4);
+    transform: translateY(-1px);
 }
 
-/* Perbaikan Area Klik Password */
 .toggle-password {
     position: absolute;
-    right: 18px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     cursor: pointer;
-    z-index: 5;
-    padding: 5px; /* Memperluas area klik */
-    transition: color 0.2s;
+    z-index: 3;
+    transition: color 0.3s;
 }
 
 .toggle-password:hover {
-    color: #00BFFF;
+    color: #fff;
 }
 
-/* Navigasi Link */
 .links-group {
     display: flex;
     justify-content: space-between;
-    font-size: 0.85rem;
-    margin: -5px 10px 25px 10px;
+    font-size: 0.9rem;
+    margin-bottom: 25px;
 }
 
 .links-group a {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
-    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+    padding: 8px 0;
 }
 
 .links-group a:hover {
@@ -136,32 +158,73 @@ body::before {
     text-decoration: underline;
 }
 
-/* Tombol Login */
 .login-btn {
     width: 100%;
     padding: 14px;
-    background-color: #0d1117;
+    background: linear-gradient(135deg, #0d1117 0%, #21262d 100%);
     color: #fff;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 30px;
-    font-size: 1rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
     font-weight: bold;
-    letter-spacing: 1px;
+    text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.login-btn:hover::before {
+    left: 100%;
 }
 
 .login-btn:hover {
-    background-color: #1a222c;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, #1a222c 0%, #303841 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
 
 .login-btn:active {
-    transform: scale(0.98);
+    transform: translateY(0);
 }
 
-/* Hilangkan ikon mata bawaan browser (Edge/Chrome) */
-input::-ms-reveal,
-input::-ms-clear {
-    display: none;
+.signup-prompt {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.signup-prompt a {
+    color: #00BFFF;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.signup-prompt a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        width: 95%;
+        padding: 30px 25px;
+        margin: 20px;
+    }
+    
+    .logo-section h1 {
+        font-size: 2rem;
+    }
 }
