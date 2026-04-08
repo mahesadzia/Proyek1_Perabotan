@@ -1,14 +1,13 @@
 <?php
 session_start();
-
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
 
-$user_role = $_SESSION['role'] ?? 'user';
-$username = $_SESSION['username'] ?? 'admin';
+$username = $_SESSION['username'] ?? 'Admin';
 
+// bates
 $barang_masuk = 25;
 $barang_keluar = 18;
 $total_inventori = 150;
@@ -34,7 +33,6 @@ $stok_kritis = [
         <div class="admin-profile">
             <i class="fas fa-user-circle"></i>
             <span><?php echo htmlspecialchars($username); ?></span>
-            <i class="fas fa-chevron-down" onclick="toggleProfile()"></i>
         </div>
         
         <a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
@@ -55,7 +53,7 @@ $stok_kritis = [
         <div class="header">
             <h2>Dashboard</h2>
             <div class="user-info">
-                <span>Selamat datang, <?php echo htmlspecialchars($username); ?> (<?php echo ucfirst($user_role); ?>)</span>
+                <span>Selamat datang</span>
                 <i class="fas fa-user-circle"></i>
             </div>
         </div>
