@@ -2,7 +2,6 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    // Cek role dan redirect sesuai dashboard
     if ($_SESSION['role'] === 'admin') {
         header("Location: admin_dashboard.php");
     } else {
@@ -24,22 +23,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $pdo = new PDO("mysql:host=localhost;dbname=balnis_db;charset=utf8", "root", "");
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Cek user dengan role dan status aktif
             $stmt = $pdo->prepare("SELECT id, username, password, role, status FROM users WHERE username = ? AND status = 'active'");
             $stmt->execute([$username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user && password_verify($password, $user['password'])) {
-                // Update last login
                 $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
                 $updateStmt->execute([$user['id']]);
                 
-                // Set session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role']; // Tambah role ke session
+                $_SESSION['role'] = $user['role'];
                 
-                // Redirect berdasarkan role
                 if ($user['role'] === 'admin') {
                     header("Location: admin_dashboard.php");
                 } else {
@@ -124,7 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             this.classList.toggle('fa-eye-slash');
         });
 
-        // Auto focus
         document.querySelector('input[name="username"]').focus();
     </script>
 
