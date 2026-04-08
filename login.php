@@ -2,7 +2,12 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    header("Location: dashboard.php");
+    // Cek role dan redirect sesuai dashboard
+    if ($_SESSION['role'] === 'admin') {
+        header("Location: admin_dashboard.php");
+    } else {
+        header("Location: karyawan_dashboard.php");
+    }
     exit();
 }
 
@@ -19,20 +24,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $pdo = new PDO("mysql:host=localhost;dbname=balnis_db;charset=utf8", "root", "");
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            $stmt = $pdo->prepare("SELECT id, username, password FROM users WHERE username = ?");
+            // Cek user dengan role dan status aktif
+            $stmt = $pdo->prepare("SELECT id, username, password, role, status FROM users WHERE username = ? AND status = 'active'");
             $stmt->execute([$username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user && password_verify($password, $user['password'])) {
+                // Update last login
+                $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+                $updateStmt->execute([$user['id']]);
+                
+                // Set session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
-                header("Location: dashboard.php");
+                $_SESSION['role'] = $user['role']; // Tambah role ke session
+                
+                // Redirect berdasarkan role
+                if ($user['role'] === 'admin') {
+                    header("Location: admin_dashboard.php");
+                } else {
+                    header("Location: karyawan_dashboard.php");
+                }
                 exit();
             } else {
-                $error = "Username atau password salah!";
+                $error = "Username belum terdaftar, password salah, atau akun belum aktif! Silahkan <a href='register.php' style='color:#00BFFF;'>daftar dulu</a>.";
             }
         } catch(PDOException $e) {
             $error = "Error server. Coba lagi!";
+            error_log("Login error: " . $e->getMessage());
         }
     }
 }
@@ -55,11 +74,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <h1>BALNIS</h1>
         </div>
 
-        <form action="#" method="post">
-            
+        <?php if (!empty($error)): ?>
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span><?php echo $error; ?></span>
+            </div>
+        <?php endif; ?>
+
+        <form action="" method="post">
             <div class="input-group">
                 <i class="fas fa-user"></i>
-                <input type="text" name="username" placeholder="Username" required>
+                <input type="text" name="username" placeholder="Username" required 
+                       value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
             </div>
 
             <div class="input-group">
@@ -69,12 +95,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
 
             <div class="links-group">
-                <a href="#">Forgot Password?</a>
-                <a href="#">Sign Up</a>
+                <a href="forgot_password.php">
+                    <i class="fas fa-key"></i> Lupa Password
+                </a>
+                <a href="register.php">
+                    <i class="fas fa-user-plus"></i> Daftar
+                </a>
             </div>
 
-            <button type="submit" class="login-btn">LOGIN</button>
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> MASUK
+            </button>
 
+            <div class="signup-prompt">
+                Belum punya akun? <a href="register.php">Daftar sekarang</a>
+            </div>
         </form>
     </div>
 
@@ -83,14 +118,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         const password = document.querySelector('#password');
 
         togglePassword.addEventListener('click', function () {
-            // Toggle tipe input
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             password.setAttribute('type', type);
-            
-            // Toggle ikon mata
             this.classList.toggle('fa-eye');
             this.classList.toggle('fa-eye-slash');
         });
+
+        // Auto focus
+        document.querySelector('input[name="username"]').focus();
     </script>
 
 </body>
