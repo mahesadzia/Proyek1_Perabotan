@@ -1,0 +1,167 @@
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('gudang.png'); /* Pastikan file ada atau ganti URL */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* Dark Overlay agar teks mudah dibaca */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); 
+    z-index: 1;
+}
+
+.login-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 400px;
+    background-color: rgba(255, 255, 255, 0.12);
+    padding: 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px); /* Support Safari */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+.logo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.logo-section img {
+    height: 45px;
+}
+
+.logo-section h1 {
+    color: #00BFFF;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+/* Grouping Input */
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group i:not(.toggle-password) {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    pointer-events: none; /* Klik akan tembus ke input di bawahnya */
+}
+
+.input-group input {
+    width: 100%;
+    /* Padding kiri & kanan diperbesar agar teks tidak menabrak ikon */
+    padding: 14px 50px 14px 50px; 
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.input-group input:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: #00BFFF;
+    box-shadow: 0 0 12px rgba(0, 191, 255, 0.3);
+}
+
+/* Perbaikan Area Klik Password */
+.toggle-password {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    z-index: 5;
+    padding: 5px; /* Memperluas area klik */
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: #00BFFF;
+}
+
+/* Navigasi Link */
+.links-group {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin: -5px 10px 25px 10px;
+}
+
+.links-group a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.links-group a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* Tombol Login */
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #0d1117;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #1a222c;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.login-btn:active {
+    transform: scale(0.98);
+}
+
+/* Hilangkan ikon mata bawaan browser (Edge/Chrome) */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
