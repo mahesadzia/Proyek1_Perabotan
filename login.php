@@ -45,57 +45,198 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BALNIS - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="login.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('gudang.png'); /* GANTI DENGAN NAMA FILE GAMBAR ANDA */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.3); /* Gelapkan 30% */
+            z-index: 1;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 2; /* Di atas overlay */
+            width: 400px;
+            background-color: rgba(255, 255, 255, 0.15); /* Transparan putih */
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px); /* Efek kaca buram (frosted) */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Garis tepi tipis */
+            text-align: center;
+        }
+
+        .logo-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .logo-section img {
+            height: 40px; /* Sesuaikan tinggi logo */
+        }
+
+        .logo-section h1 {
+            color: #00BFFF; /* Warna Biru Langit BALNIS */
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px 12px 45px; /* Padding kiri lebih untuk ikon */
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-group input:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: #00BFFF;
+            box-shadow: 0 0 8px rgba(0, 191, 255, 0.4);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .links-group {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+        }
+
+        .links-group a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .links-group a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* --- Tombol LOGIN --- */
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #0d1117; /* Hitam gelap */
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .login-btn:hover {
+            background-color: #1a222c;
+        }
+
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+    </style>
 </head>
 <body>
+
     <div class="login-container">
         <div class="logo-section">
-            <img src="logo.png" alt="BALNIS Logo"> 
-            <h1>BALNIS</h1>
+            <img src="logo.png" alt="BALNIS Logo"> <h1>BALNIS</h1>
         </div>
 
-        <!-- Alert Error -->
-        <?php if ($error): ?>
-        <div style="background: rgba(255,0,0,0.3); padding: 12px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(255,0,0,0.5); color: #fff; font-size: 0.9rem;">
-            <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
-        </div>
-        <?php endif; ?>
-
-        <form method="POST" action="">
+        <form action="#" method="post">
+            
             <div class="input-group">
                 <i class="fas fa-user"></i>
-                <input type="text" name="username" placeholder="Username" 
-                       value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" 
-                       required autocomplete="username">
+                <input type="text" name="username" placeholder="Username" required>
             </div>
 
             <div class="input-group">
                 <i class="fas fa-lock"></i>
-                <input type="password" name="password" id="password" placeholder="Password" 
-                       required autocomplete="current-password">
+                <input type="password" name="password" id="password" placeholder="Password" required>
                 <i class="fas fa-eye toggle-password" id="togglePassword"></i>
             </div>
 
             <div class="links-group">
-                <a href="forgot-password.php">Forgot Password?</a>
-                <a href="register.php">Sign Up</a>
+                <a href="#">Forgot Password?</a>
+                <a href="#">Sign Up</a>
             </div>
 
-            <button type="submit" class="login-btn">
-                <i class="fas fa-sign-in-alt"></i> LOGIN
-            </button>
+            <button type="submit" class="login-btn">LOGIN</button>
+
         </form>
+
     </div>
 
     <script>
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
 
-        togglePassword.addEventListener('click', function () {
+        togglePassword.addEventListener('click', function (e) {
+            // Toggle tipe input antara 'password' dan 'text'
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             password.setAttribute('type', type);
+            // Toggle ikon mata
             this.classList.toggle('fa-eye-slash');
         });
     </script>
+
 </body>
 </html>
