@@ -3,7 +3,7 @@ session_start();
 
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] === 'admin') {
-        header("Location: admin_dashboard.php");
+        header("Location: dashboard.php");
     } else {
         header("Location: karyawan_dashboard.php");
     }
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['role'] = $user['role'];
                 
                 if ($user['role'] === 'admin') {
-                    header("Location: admin_dashboard.php");
+                    header("Location: dashboard.php");
                 } else {
                     header("Location: karyawan_dashboard.php");
                 }
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BALNIS - Login</title>
+    <title>BALNIS - Login System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="login.css">
 </head>
@@ -65,18 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <div class="login-container">
         <div class="logo-section">
-            <img src="logo.png" alt="BALNIS Logo"> 
+            <img src="../img/logo.png" alt="Logo"> 
             <h1>BALNIS</h1>
         </div>
 
-        <?php if (!empty($error)): ?>
+        <?php if ($error): ?>
             <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-circle"></i>
                 <span><?php echo $error; ?></span>
             </div>
         <?php endif; ?>
 
-        <form action="" method="post">
+        <form action="" method="post" autocomplete="off">
             <div class="input-group">
                 <i class="fas fa-user"></i>
                 <input type="text" name="username" placeholder="Username" required 
@@ -86,41 +86,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="input-group">
                 <i class="fas fa-lock"></i>
                 <input type="password" name="password" id="password" placeholder="Password" required>
-                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                <div class="toggle-password" id="togglePassword">
+                    <i class="fas fa-eye"></i>
+                </div>
             </div>
 
             <div class="links-group">
-                <a href="forgot_password.php">
-                    <i class="fas fa-key"></i> Lupa Password
-                </a>
-                <a href="register.php">
-                    <i class="fas fa-user-plus"></i> Daftar
-                </a>
+                <a href="forgot_password.php">Lupa Password?</a>
+                <a href="register.php">Daftar Akun</a>
             </div>
 
-            <button type="submit" class="login-btn">
-                <i class="fas fa-sign-in-alt"></i> MASUK
-            </button>
-
-            <div class="signup-prompt">
-                Belum punya akun? <a href="register.php">Daftar sekarang</a>
+            <button type="submit" class="login-btn">MASUK</button>
+            
+            <div class="footer-text">
+                Belum punya akun? <a href="register.php">Klik di sini</a>
             </div>
         </form>
     </div>
 
     <script>
-        const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
+        const toggleBtn = document.querySelector('#togglePassword');
+        const passwordInput = document.querySelector('#password');
+        const icon = toggleBtn.querySelector('i');
 
-        togglePassword.addEventListener('click', function () {
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
+        toggleBtn.addEventListener('click', function() {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
         });
-
-        document.querySelector('input[name="username"]').focus();
     </script>
-
 </body>
 </html>
