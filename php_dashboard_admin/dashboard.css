@@ -79,10 +79,30 @@ body {
 }
 
 header {
+    background: var(--white);
+    padding: 15px 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+}
+
+.card {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
 }
 
 /* GRID STATS */
@@ -100,7 +120,6 @@ header {
     position: relative;
     overflow: hidden;
 }
-
 .card h2 { font-size: 32px; margin: 10px 0; }
 .card p { margin: 0; font-size: 14px; opacity: 0.9; }
 .card a {
