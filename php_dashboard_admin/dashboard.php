@@ -46,10 +46,10 @@ $omset = "15.500.000";
 </div>
 
     <div class="main-wrapper">
-        <header>
-            <h1>Dashboard</h1>
-            <div class="user-welcome">Selamat datang, admin (User) <i class="fa fa-user-circle"></i></div>
-        </header>
+    <header>
+        <div style="font-weight:bold;"><i class="fa fa-bars"></i> Dashboard</div>
+        <div>Admin <i class="fa fa-user-circle"></i></div>
+    </header>
 
         <div class="stats-grid">
             <div class="card card-blue">
