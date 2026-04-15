@@ -35,8 +35,8 @@ $omset = "15.500.000";
     <a href="inventori.php"><i class="fas fa-boxes"></i> Inventori</a>
 
     <h3>TRANSAKSI</h3>
-    <a href="pembelian.php"><i class="fas fa-shopping-cart"></i> Pembelian</a>
-    <a href="penjualan.php"><i class="fas fa-file-invoice"></i> Penjualan</a>
+    <a href="barang_masuk.php"><i class="fas fa-shopping-cart"></i> Barang Masuk</a>
+    <a href="barang_keluar.php"><i class="fas fa-file-export"></i> Barang Keluar</a>
 
     <h3>REPORT</h3>
     <a href="laporan_pembelian.php"><i class="fas fa-chart-line"></i> Laporan Pembelian</a>
