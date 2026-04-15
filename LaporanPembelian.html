@@ -1,585 +1,146 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Laporan Pembelian</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pembelian</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
 
-        .sidebar {
-            width: 250px;
-            background-color: #337ab7;
-            color: #fff;
-            padding: 20px;
-            box-sizing: border-box;
-            flex-shrink: 0;
-        }
+    <link rel="stylesheet" href="laporanPembelian.css" />
 
-        .admin-profile {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
 
-        .admin-profile i {
-            font-size: 3rem;
-            margin-right: 15px;
-        }
+  <body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="admin-profile">
+        <i class="fas fa-user-circle"></i>
+        <span>Admin</span>
+      </div>
 
-        .sidebar a {
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
+      <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="#"><i class="fas fa-boxes-stacked"></i> Inventori</a>
 
-        .sidebar a i:first-child {
-            width: 25px;
-            margin-right: 10px;
-        }
+      <h3>Transaksi</h3>
+      <a href="Pembelian.html"
+        ><i class="fas fa-shopping-cart"></i> Pembelian</a
+      >
+      <a href="Penjualan.html"><i class="fas fa-file-invoice"></i> Penjualan</a>
 
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar h3 {
-            margin-top: 25px;
-            margin-bottom: 10px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
-        
-        header { 
-            height: 55px; 
-            background-color: #fff; /* Header putih */
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 25px; 
-            color: #555; 
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-            z-index: 100;
-        }
-        
-        header i.fa-bars {
-            font-size: 1.2rem;
-            color: #888;
-        }
-        
-        .header-user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-        }
-        
-        .header-user-info i.fa-user-circle {
-            font-size: 1.4rem;
-            color: #ccc;
-        }
-        
-        .header-user-info i.fa-caret-down {
-            font-size: 0.9rem;
-            color: #bbb;
-        }
-
-        .content-area { padding: 30px; }
-        
-        .page-title { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 30px; }
-        .page-title h1 { font-weight: 400; font-size: 30px; color: #444; }
-        
-        .breadcrumb { font-size: 14px; color: #888; }
-        .breadcrumb a { color: #888; text-decoration: none; }
-        .breadcrumb a:hover { color: #337ab7; text-decoration: underline; }
-        .breadcrumb span { color: #555; font-weight: 500; }
-        
-        .card { 
-            background: white; 
-            border-radius: 5px; 
-            box-shadow: 0 1px 1px rgba(0,0,0,0.1); 
-            border-top: 3px solid #d2d6de; /* Garis abu-abu atas */
-            overflow: hidden;
-        }
-
-        .card-header { 
-            padding: 15px 20px; 
-            border-bottom: 1px solid #f4f4f4; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-
-        .card-header h3 { font-size: 17px; color: #333; display: flex; align-items: center; gap: 8px; font-weight: 500; }
-        .card-header h3 i { color: #337ab7; }
-        
-        .btn-blue { 
-            background-color: #3c8dbc; 
-            color: white; 
-            border: none; 
-            padding: 7px 15px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 500;
-            transition: 0.1s;
-        }
-
-        .btn-blue:hover { background-color: #367fa9; }
-        
-        .table-filter { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #666; }
-        .table-filter-group { display: flex; align-items: center; gap: 8px; }
-        .table-filter input, .table-filter select { border: 1px solid #ccc; padding: 6px 12px; outline: none; border-radius: 3px; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; border-bottom: 2px solid #f4f4f4; font-size: 15px; color: #444; cursor: pointer; font-weight: 600; white-space: nowrap;}
-        th i { font-size: 12px; color: #bbb; margin-left: 8px; }
-        
-        td { padding: 15px; border-bottom: 1px solid #f4f4f4; font-size: 15px; color: #555; vertical-align: middle; }
-        tr:hover td { background-color: #fcfcfc; }
-        
-        .opsi-icons i { margin-right: 12px; cursor: pointer; color: #777; font-size: 1.1rem;}
-        .opsi-icons i:hover { color: #333; }
-        
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; }
-        .status-sukses { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
-        .status-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
-    </style>
-</head>
-<body>
-
-    <aside class="sidebar">
-        <div class="admin-profile">
-            <i class="fas fa-user-circle"></i>
-            <a href="Admin">Admin</a>
-        </div>
-        
-        <nav>
-        <a href="Dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="inventoriBarang.html"><i class="fas fa-boxes-stacked"></i> Inventori</a>
-        
-        <h3>Transaksi</h3>
-        <a href="Pembelian.html"><i class="fas fa-shopping-cart"></i> Pembelian</a>
-        <a href="Penjualan.html"><i class="fas fa-file-invoice"></i> Penjualan</a>
-        
-        <h3>Report</h3>
-        <a href="LaporanPembelian.html"><i class="fas fa-chart-line"></i> Laporan Pembelian</a>
-        <a href="LaporanPenjualan.html"><i class="fas fa-chart-bar"></i> Laporan Penjualan</a>
-        </nav>
-    </aside>
-
-    <div class="main-wrapper">
-        <header>
-            <i class="fa fa-bars" style="cursor: pointer;"></i>
-            <div class="header-user-info">
-                <span>admin perabotan</span> <i class="fa fa-user-circle"></i> <i class="fa fa-caret-down"></i>
-            </div>
-        </header>
-
-        <section class="content-area">
-            <div class="page-title">
-                <h1>Laporan Pembelian</h1>
-                <div class="breadcrumb">Home / Laporan / <span>Laporan Pembelian</span></div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fa fa-file-invoice-dollar"></i> Riwayat Pembelian</h3>
-                    <button class="btn-blue" onclick="window.print()"><i class="fa fa-print"></i> Cetak</button>
-                </div>
-
-                <div class="table-filter">
-                    <div class="table-filter-group">
-                        Show 
-                        <select>
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option>
-                        </select> 
-                        entries
-                    </div>
-                    <div class="table-filter-group">
-                        Search: <input type="text" placeholder="Cari supplier atau item...">
-                    </div>
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No. Faktur</th>
-                            <th>Tanggal</th>
-                            <th>Supplier</th>
-                            <th>Item</th>
-                            <th>Jumlah</th>
-                            <th>Total Harga</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>INV-BEL-001</td>
-                            <td>2023-10-01</td>
-                            <td>PT. Maju Jaya</td>
-                            <td>Ember Besar (10L)</td>
-                            <td>50</td>
-                            <td>Rp 250.000</td>
-                            <td><span class="status-badge status-sukses">Lunas</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>INV-BEL-002</td>
-                            <td>2023-10-02</td>
-                            <td>CV. Elektronik</td>
-                            <td>Blender 500W</td>
-                            <td>10</td>
-                            <td>Rp 500.000</td>
-                            <td><span class="status-badge status-warning">Pending</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>INV-BEL-003</td>
-                            <td>2023-10-05</td>
-                            <td>PT. Maju Jaya</td>
-                            <td>Centong Nasi</td>
-                            <td>100</td>
-                            <td>Rp 300.000</td>
-                            <td><span class="status-badge status-sukses">Lunas</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+      <h3>Report</h3>
+      <a href="LaporanPembelian.html" class="active">
+        <i class="fas fa-chart-line"></i> Laporan Pembelian
+      </a>
+      <a href="LaporanPenjualan.html">
+        <i class="fas fa-chart-bar"></i> Laporan Penjualan
+      </a>
     </div>
 
-</body>
-</html>
-
-        body { display: flex; background-color: #f4f6f9; min-height: 100vh; overflow-x: hidden; }
-        
-        .sidebar {
-            width: 250px;
-            background-color: #337ab7;
-            color: #fff;
-            padding: 20px;
-            box-sizing: border-box;
-            flex-shrink: 0;
-        }
-
-        .admin-profile {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .admin-profile i {
-            font-size: 3rem;
-            margin-right: 15px;
-        }
-
-        .sidebar a {
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .sidebar a i:first-child {
-            width: 25px;
-            margin-right: 10px;
-        }
-
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar h3 {
-            margin-top: 25px;
-            margin-bottom: 10px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .sidebar nav a:hover { 
-            background-color: rgba(0,0,0,0.1); 
-            color: #fff;
-        }
-
-        .sidebar nav a.active { 
-            background-color: #eceff1; 
-            color: #337ab7; 
-            font-weight: 600; 
-        }
-        
-        .sidebar nav a.active i {
-            color: #337ab7;
-        }
-        
-        .section-label { 
-            padding: 25px 20px 8px; 
-            font-size: 0.8rem; 
-            text-transform: uppercase; 
-            letter-spacing: 1.2px; 
-            color: rgba(255,255,255,0.5); /* Putih sangat pudar */
-            font-weight: 600;
-        }
-        
-        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
-        
-        header { 
-            height: 55px; 
-            background-color: #fff; /* Header putih */
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 25px; 
-            color: #555; 
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-            z-index: 100;
-        }
-        
-        header i.fa-bars {
-            font-size: 1.2rem;
-            color: #888;
-        }
-        
-        .header-user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-        }
-        
-        .header-user-info i.fa-user-circle {
-            font-size: 1.4rem;
-            color: #ccc;
-        }
-        
-        .header-user-info i.fa-caret-down {
-            font-size: 0.9rem;
-            color: #bbb;
-        }
-
-        .content-area { padding: 30px; }
-        
-        .page-title { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 30px; }
-        .page-title h1 { font-weight: 400; font-size: 30px; color: #444; }
-        
-        .breadcrumb { font-size: 14px; color: #888; }
-        .breadcrumb a { color: #888; text-decoration: none; }
-        .breadcrumb a:hover { color: #337ab7; text-decoration: underline; }
-        .breadcrumb span { color: #555; font-weight: 500; }
-        
-        .card { 
-            background: white; 
-            border-radius: 5px; 
-            box-shadow: 0 1px 1px rgba(0,0,0,0.1); 
-            border-top: 3px solid #d2d6de; /* Garis abu-abu atas */
-            overflow: hidden;
-        }
-
-        .card-header { 
-            padding: 15px 20px; 
-            border-bottom: 1px solid #f4f4f4; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-
-        .card-header h3 { font-size: 17px; color: #333; display: flex; align-items: center; gap: 8px; font-weight: 500; }
-        .card-header h3 i { color: #337ab7; }
-        
-        .btn-blue { 
-            background-color: #3c8dbc; 
-            color: white; 
-            border: none; 
-            padding: 7px 15px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 500;
-            transition: 0.1s;
-        }
-
-        .btn-blue:hover { background-color: #367fa9; }
-        
-        .table-filter { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #666; }
-        .table-filter-group { display: flex; align-items: center; gap: 8px; }
-        .table-filter input, .table-filter select { border: 1px solid #ccc; padding: 6px 12px; outline: none; border-radius: 3px; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; border-bottom: 2px solid #f4f4f4; font-size: 15px; color: #444; cursor: pointer; font-weight: 600; white-space: nowrap;}
-        th i { font-size: 12px; color: #bbb; margin-left: 8px; }
-        
-        td { padding: 15px; border-bottom: 1px solid #f4f4f4; font-size: 15px; color: #555; vertical-align: middle; }
-        tr:hover td { background-color: #fcfcfc; }
-        
-        .opsi-icons i { margin-right: 12px; cursor: pointer; color: #777; font-size: 1.1rem;}
-        .opsi-icons i:hover { color: #333; }
-        
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; }
-        .status-sukses { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
-        .status-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
-    </style>
-</head>
-<body>
-
-    <aside class="sidebar">
-        <div class="admin-profile">
-            <i class="fas fa-user-circle"></i>
-            <a href="Admin">Admin</a>
+    <!-- MAIN -->
+    <div class="main-content">
+      <div class="header">
+        <h2>Laporan Pembelian</h2>
+        <div class="user-info">
+          <span>admin perabotan</span>
+          <i class="fas fa-user-circle"></i>
         </div>
-        
-        <nav>
-            <a href="Dashboard.html"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
-            
-            <a href="inventoriBarang.html"><i class="fa fa-box"></i> Inventori</a>
-            
-            <div class="section-label">Transaksi</div>
-            <a href="Pembelian.html"><i class="fa fa-shopping-cart"></i> Pembelian</a>
-            <a href="Penjualan.html"><i class="fa fa-file-invoice"></i> Penjualan</a>
-            
-            <div class="section-label">Report</div>
-            <a href="LaporanPembelian.html" class="active"><i class="fa fa-chart-line"></i> Laporan Pembelian</a>
-            <a href="LaporanPenjualan.html"><i class="fa fa-chart-bar"></i> Laporan Penjualan</a>
-        </nav>
-    </aside>
+      </div>
 
-    <div class="main-wrapper">
-        <header>
-            <i class="fa fa-bars" style="cursor: pointer;"></i>
-            <div class="header-user-info">
-                <span>admin perabotan</span> <i class="fa fa-user-circle"></i> <i class="fa fa-caret-down"></i>
-            </div>
-        </header>
+      <!-- PANEL -->
+      <div class="info-panel table-panel">
+        <div class="panel-header">
+          <h3><i class="fas fa-file-invoice-dollar"></i> Riwayat Pembelian</h3>
 
-        <section class="content-area">
-            <div class="page-title">
-                <h1>Laporan Pembelian</h1>
-                <div class="breadcrumb">Home / Laporan / <span>Laporan Pembelian</span></div>
-            </div>
+          <button class="btn btn-primary" onclick="window.print()">
+            <i class="fa fa-print"></i> Cetak
+          </button>
+        </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fa fa-file-invoice-dollar"></i> Riwayat Pembelian</h3>
-                    <button class="btn-blue" onclick="window.print()"><i class="fa fa-print"></i> Cetak</button>
-                </div>
+        <!-- FILTER -->
+        <div class="table-filter">
+          <div>
+            Show
+            <select>
+              <option>10</option>
+              <option>25</option>
+              <option>50</option>
+            </select>
+            entries
+          </div>
 
-                <div class="table-filter">
-                    <div class="table-filter-group">
-                        Show 
-                        <select>
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option>
-                        </select> 
-                        entries
-                    </div>
-                    <div class="table-filter-group">
-                        Search: <input type="text" placeholder="Cari supplier atau item...">
-                    </div>
-                </div>
+          <div>
+            Search:
+            <input type="text" placeholder="Cari supplier atau item..." />
+          </div>
+        </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No. Faktur</th>
-                            <th>Tanggal</th>
-                            <th>Supplier</th>
-                            <th>Item</th>
-                            <th>Jumlah</th>
-                            <th>Total Harga</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>INV-BEL-001</td>
-                            <td>2023-10-01</td>
-                            <td>PT. Maju Jaya</td>
-                            <td>Ember Besar (10L)</td>
-                            <td>50</td>
-                            <td>Rp 250.000</td>
-                            <td><span class="status-badge status-sukses">Lunas</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>INV-BEL-002</td>
-                            <td>2023-10-02</td>
-                            <td>CV. Elektronik</td>
-                            <td>Blender 500W</td>
-                            <td>10</td>
-                            <td>Rp 500.000</td>
-                            <td><span class="status-badge status-warning">Pending</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>INV-BEL-003</td>
-                            <td>2023-10-05</td>
-                            <td>PT. Maju Jaya</td>
-                            <td>Centong Nasi</td>
-                            <td>100</td>
-                            <td>Rp 300.000</td>
-                            <td><span class="status-badge status-sukses">Lunas</span></td>
-                            <td class="opsi-icons">
-                                <i class="fa fa-eye" title="Detail"></i>
-                                <i class="fa fa-print" title="Cetak"></i>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        <!-- TABLE -->
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>No. Faktur</th>
+                <th>Tanggal</th>
+                <th>Supplier</th>
+                <th>Item</th>
+                <th class="text-center">Jumlah</th>
+                <th class="text-right">Total Harga</th>
+                <th>Status</th>
+                <th class="text-center">Aksi</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>INV-BEL-001</td>
+                <td>2023-10-01</td>
+                <td>PT. Maju Jaya</td>
+                <td>Ember Besar (10L)</td>
+                <td class="text-center">50</td>
+                <td class="text-right">Rp 250.000</td>
+                <td><span class="status-badge status-sukses">Lunas</span></td>
+                <td class="text-center opsi-icons">
+                  <i class="fa fa-eye"></i>
+                  <i class="fa fa-print"></i>
+                </td>
+              </tr>
+
+              <tr>
+                <td>INV-BEL-002</td>
+                <td>2023-10-02</td>
+                <td>CV. Elektronik</td>
+                <td>Blender 500W</td>
+                <td class="text-center">10</td>
+                <td class="text-right">Rp 500.000</td>
+                <td>
+                  <span class="status-badge status-warning">Pending</span>
+                </td>
+                <td class="text-center opsi-icons">
+                  <i class="fa fa-eye"></i>
+                  <i class="fa fa-print"></i>
+                </td>
+              </tr>
+
+              <tr>
+                <td>INV-BEL-003</td>
+                <td>2023-10-05</td>
+                <td>PT. Maju Jaya</td>
+                <td>Centong Nasi</td>
+                <td class="text-center">100</td>
+                <td class="text-right">Rp 300.000</td>
+                <td><span class="status-badge status-sukses">Lunas</span></td>
+                <td class="text-center opsi-icons">
+                  <i class="fa fa-eye"></i>
+                  <i class="fa fa-print"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-
-</body>
+  </body>
 </html>

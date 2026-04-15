@@ -108,7 +108,7 @@ $result = mysqli_query($conn, "SELECT * FROM inventori_barang");
             $status = "Menipis";
             $class = "status-menipis";
         } else {
-            $status = "Aktif";
+            $status = "Aman";
             $class = "status-aktif";
         }
     ?>

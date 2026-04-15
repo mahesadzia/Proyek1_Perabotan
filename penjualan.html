@@ -1,23 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Transaksi Penjualan - Sistem Inventori</title>
+    <title>Transaksi Penjualan</title>
+
+    <link rel="stylesheet" href="penjualan.css" />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="penjualan.css" />
   </head>
+
   <body>
+    <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="admin-profile">
         <i class="fas fa-user-circle"></i>
-        <a href="#">Admin</a>
+        <span>Admin</span>
       </div>
 
-      <a href="Dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="Dashboard.html"
+        ><i class="fas fa-tachometer-alt"></i> Dashboard</a
+      >
       <a href="inventoriBarang.html"
         ><i class="fas fa-boxes-stacked"></i> Inventori</a
       >
@@ -26,9 +32,9 @@
       <a href="Pembelian.html"
         ><i class="fas fa-shopping-cart"></i> Pembelian</a
       >
-      <a href="Penjualan.html" class="active"
-        ><i class="fas fa-file-invoice"></i> Penjualan</a
-      >
+      <a href="Penjualan.html" class="active">
+        <i class="fas fa-file-invoice"></i> Penjualan
+      </a>
 
       <h3>Report</h3>
       <a href="LaporanPembelian.html"
@@ -39,92 +45,96 @@
       >
     </div>
 
+    <!-- MAIN -->
     <div class="main-content">
+      <!-- HEADER -->
       <div class="header">
         <h2>Transaksi Penjualan</h2>
         <div class="user-info">
-          <span>admin</span>
+          <span>admin perabotan</span>
           <i class="fas fa-user-circle"></i>
         </div>
       </div>
 
-      <div class="panel">
-        <h3>
-          <i class="fas fa-plus-circle" style="color: #337ab7"></i> Input
-          Penjualan Baru
-        </h3>
+      <!-- FORM -->
+      <div class="info-panel">
+        <h3><i class="fas fa-plus-circle"></i> Input Penjualan</h3>
 
-        <div class="form-grid">
+        <div class="form-row">
           <div class="form-group">
-            <label>Tanggal Transaksi</label>
+            <label>Tanggal</label>
             <input type="date" />
           </div>
+
           <div class="form-group">
-            <label>Barang yang dijual</label>
-            <input type="text" placeholder="Masukkan nama barang..." />
-          </div>
-          <div class="form-group">
-            <label>Jumlah (Qty)</label>
-            <input type="number" placeholder="0" />
-          </div>
-          <div class="form-group">
-            <label>Total Harga (Rp)</label>
-            <input type="number" placeholder="0" />
+            <label>Barang</label>
+            <input type="text" placeholder="Nama barang" />
           </div>
         </div>
 
-        <button class="btn-submit">
-          <i class="fas fa-save"></i> Simpan Transaksi
-        </button>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Jumlah</label>
+            <input type="number" id="jumlah" />
+          </div>
+
+          <div class="form-group">
+            <label>Harga</label>
+            <input type="number" id="harga" />
+          </div>
+
+          <div class="form-group">
+            <label>Total</label>
+            <input type="number" id="total" readonly />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary">
+            <i class="fas fa-save"></i> Simpan
+          </button>
+        </div>
       </div>
 
-      <div class="panel">
-        <h3>
-          <i class="fas fa-list" style="color: #337ab7"></i> Riwayat Penjualan
-          Terakhir
-        </h3>
+      <!-- TABLE -->
+      <div class="info-panel">
+        <h3><i class="fas fa-list"></i> Riwayat Penjualan</h3>
 
-        <div style="overflow-x: auto">
-          <table>
+        <div class="table-container">
+          <table class="data-table">
             <thead>
               <tr>
-                <th class="text-center">No</th>
+                <th>No</th>
                 <th>Tanggal</th>
                 <th>Barang</th>
                 <th class="text-center">Jumlah</th>
-                <th>Total (Rp)</th>
+                <th class="text-right">Total</th>
                 <th class="text-center">Aksi</th>
               </tr>
             </thead>
+
             <tbody>
               <tr>
-                <td class="text-center">1</td>
+                <td>1</td>
                 <td>2026-10-11</td>
                 <td>Ember Besar</td>
                 <td class="text-center">20</td>
-                <td>140.000</td>
+                <td class="text-right">140.000</td>
                 <td class="text-center">
-                  <button class="btn-action btn-edit" title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn-action btn-delete" title="Hapus">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <button class="btn-icon"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon"><i class="fas fa-trash"></i></button>
                 </td>
               </tr>
+
               <tr>
-                <td class="text-center">2</td>
+                <td>2</td>
                 <td>2026-11-20</td>
                 <td>Centong Nasi</td>
                 <td class="text-center">10</td>
-                <td>30.000</td>
+                <td class="text-right">30.000</td>
                 <td class="text-center">
-                  <button class="btn-action btn-edit" title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn-action btn-delete" title="Hapus">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <button class="btn-icon"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon"><i class="fas fa-trash"></i></button>
                 </td>
               </tr>
             </tbody>
@@ -134,14 +144,16 @@
     </div>
 
     <script>
-      // Script dari index
-      function toggleDropdown() {
-        var dropdown = document.getElementById("adminMenu");
-        if (dropdown) {
-          dropdown.style.display =
-            dropdown.style.display === "block" ? "none" : "block";
-        }
+      const jumlah = document.getElementById("jumlah");
+      const harga = document.getElementById("harga");
+      const total = document.getElementById("total");
+
+      function hitung() {
+        total.value = jumlah.value * harga.value || 0;
       }
+
+      jumlah.addEventListener("input", hitung);
+      harga.addEventListener("input", hitung);
     </script>
   </body>
 </html>

@@ -1,0 +1,151 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  display: flex;
+  height: 100vh;
+  background-color: #f4f4f4;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  background-color: #337ab7;
+  color: #fff;
+  padding: 20px;
+}
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-profile i {
+  font-size: 3rem;
+  margin-right: 15px;
+}
+
+.sidebar a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 10px;
+  border-radius: 4px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar h3 {
+  margin-top: 25px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* MAIN */
+.main-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+header {
+  height: 55px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+}
+
+/* CONTENT */
+.content-area {
+  padding: 30px;
+}
+
+.page-title h1 {
+  margin-bottom: 5px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #777;
+}
+
+/* CARD */
+.card {
+  background: #fff;
+  border-radius: 5px;
+  border-top: 3px solid #d2d6de;
+  margin-top: 20px;
+}
+
+.card-header {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* BUTTON */
+.btn-blue {
+  background-color: #3c8dbc;
+  color: #fff;
+  padding: 7px 15px;
+  border: none;
+  border-radius: 4px;
+}
+
+.btn-green {
+  background-color: #28a745;
+  color: #fff;
+  padding: 7px 15px;
+  border: none;
+  border-radius: 4px;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+/* STATUS */
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.status-lunas {
+  background: #d4edda;
+}
+
+.status-pending {
+  background: #fff3cd;
+}
+
+.status-batal {
+  background: #f8d7da;
+}
+
+/* ICON */
+.opsi-icons i {
+  cursor: pointer;
+}
