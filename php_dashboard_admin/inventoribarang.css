@@ -1,208 +1,210 @@
 :root {
-    --primary: #3498db;
-    --dark: #2c3e50;
-    --bg: #f4f7f6;
-    --danger: #e74c3c;
-    --success: #2ecc71;
-    --white: #ffffff;
-    --sidebar-color: #337ab7;
+  --primary: #3498db;
+  --dark: #2c3e50;
+  --bg: #f4f7f6;
+  --danger: #e74c3c;
+  --success: #2ecc71;
+  --white: #ffffff;
+  --sidebar-color: #337ab7;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg);
-    margin: 0;
-    display: flex; /* Membuat sidebar dan konten bersampingan */
-    min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg);
+  margin: 0;
+  display: flex; /* Membuat sidebar dan konten bersampingan */
+  min-height: 100vh;
 }
 
 /* SIDEBAR */
 .sidebar {
-    width: 250px;
-    background-color: var(--sidebar-color);
-    color: #fff;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0; 
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    box-sizing: border-box;
+  width: 250px;
+  background: #007bbd;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
 }
 
 .admin-profile {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .admin-profile i {
-    font-size: 2.5rem;
-    margin-right: 15px;
+  font-size: 2.5rem;
+  margin-right: 15px;
 }
 
 .sidebar h3 {
-    margin: 20px 0 10px 0;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: rgba(255, 255, 255, 0.7);
+  margin: 20px 0 10px 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .sidebar a {
-    display: block;
-    color: #fff;
-    text-decoration: none;
-    padding: 12px 15px;
-    border-radius: 4px;
-    transition: 0.3s;
-    margin-bottom: 2px;
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 15px;
+  border-radius: 4px;
+  transition: 0.3s;
+  margin-bottom: 2px;
 }
 
 .sidebar a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar a i {
-    width: 25px;
-    margin-right: 10px;
+  width: 25px;
+  margin-right: 10px;
 }
 
 .logout-btn {
-    margin-top: auto !important;
-    color: #ff6b6b !important;
-    font-weight: bold;
+  margin-top: auto !important;
+  color: #ff6b6b !important;
+  font-weight: bold;
 }
 
 /* MAIN CONTENT */
 .main-wrapper {
-    flex-grow: 1; /* Mengisi sisa lebar layar secara otomatis */
-    padding: 25px;
-    overflow-y: auto;
+  flex-grow: 1; /* Mengisi sisa lebar layar secara otomatis */
+  padding: 25px;
+  overflow-y: auto;
 }
 
 header {
-    background: var(--white);
-    padding: 15px 25px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: var(--white);
+  padding: 15px 25px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .card {
-    background: var(--white);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  background: var(--white);
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
 
 /* TABLE */
 table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 th {
-    background: #f8f9fa;
-    text-align: left;
-    padding: 15px;
-    color: #666;
-    border-bottom: 2px solid #dee2e6;
+  background: #f8f9fa;
+  text-align: left;
+  padding: 15px;
+  color: #666;
+  border-bottom: 2px solid #dee2e6;
 }
 
 td {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    color: #444;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  color: #444;
 }
 
 /* Badge Dasar */
 .status-badge {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    color: white;
-    display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  display: inline-block;
 }
 
 /* Warna-warna Status */
 .status-aktif {
-    background-color: #2ecc71; /* Hijau */
+  background-color: #2ecc71; /* Hijau */
 }
 
 .status-menipis {
-    background-color: #f39c12; /* Orange/Kuning */
+  background-color: #f39c12; /* Orange/Kuning */
 }
 
 .status-habis {
-    background-color: #e74c3c; /* Merah */
+  background-color: #e74c3c; /* Merah */
 }
 
 .btn-blue {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 /* MODAL */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    backdrop-filter: blur(3px);
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
 }
 
 .modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 25px;
-    width: 400px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 25px;
+  width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal-content input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
 }
 
 .modal-footer {
-    text-align: right;
-    margin-top: 15px;
+  text-align: right;
+  margin-top: 15px;
 }
 
 .btn-cancel {
-    background: #95a5a6;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
+  background: #95a5a6;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
 }
