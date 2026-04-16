@@ -56,7 +56,7 @@ $omset = "15.500.000";
                 <i class="fas fa-file-import icon-bg"></i>
                 <h2><?php echo $barang_masuk; ?></h2>
                 <p>Barang Masuk</p>
-                <a href="#">Lihat Detail <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="barang_masuk.php">Lihat Detail <i class="fa fa-arrow-circle-right"></i></a>
             </div>
 
             <div class="card card-green">
