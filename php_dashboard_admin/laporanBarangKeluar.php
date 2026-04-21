@@ -97,7 +97,7 @@ $result = mysqli_query($conn, "SELECT * FROM detail_barang_keluar");
             <tr>
               <th>No. Invoice</th>
               <th>Tanggal</th>
-              <>Item Jual<//th>
+              <th>Item Jual</th>
               <th>Jumlah</th>
               <th>Harga Satuan</th>
               <th>Total</th>
