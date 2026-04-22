@@ -13,8 +13,70 @@ $barang_masuk  = mysqli_fetch_assoc($q_masuk)['total'] ?? 0;
 $q_keluar      = mysqli_query($conn, "SELECT COUNT(*) as total FROM barang_keluar");
 $barang_keluar = mysqli_fetch_assoc($q_keluar)['total'] ?? 0;
 
-$q_omset       = mysqli_query($conn, "SELECT SUM(dbk.jumlah * ib.harga_jual) as omset FROM detail_barang_keluar dbk JOIN inventori_barang ib ON dbk.id_barang = ib.id_barang");
-$omset         = number_format(mysqli_fetch_assoc($q_omset)['omset'] ?? 0, 0, ',', '.');
+// ─── Omset per bulan (keluar - masuk) ─────────────────────────────────────────
+$bulan_ini = date('Y-m');
+
+// Total penjualan (barang keluar) per bulan
+$q_keluar_bulan = mysqli_query($conn, "
+    SELECT DATE_FORMAT(tanggal, '%Y-%m') as bulan,
+           DATE_FORMAT(tanggal, '%M %Y') as label,
+           SUM(total) as total_keluar
+    FROM barang_keluar
+    GROUP BY DATE_FORMAT(tanggal, '%Y-%m')
+    ORDER BY bulan DESC
+    LIMIT 6
+");
+$data_keluar = [];
+while ($r = mysqli_fetch_assoc($q_keluar_bulan)) {
+    $data_keluar[$r['bulan']] = ['label' => $r['label'], 'keluar' => $r['total_keluar']];
+}
+
+// Total pembelian (barang masuk) per bulan
+$q_masuk_bulan = mysqli_query($conn, "
+    SELECT DATE_FORMAT(bm.tanggal_masuk, '%Y-%m') as bulan,
+           SUM(dbm.jumlah * dbm.harga_beli) as total_masuk
+    FROM barang_masuk bm
+    JOIN detail_barang_masuk dbm ON bm.id_masuk = dbm.id_masuk
+    GROUP BY DATE_FORMAT(bm.tanggal_masuk, '%Y-%m')
+");
+$data_masuk = [];
+while ($r = mysqli_fetch_assoc($q_masuk_bulan)) {
+    $data_masuk[$r['bulan']] = $r['total_masuk'];
+}
+
+// Gabungkan semua bulan yang ada
+$semua_bulan = array_unique(array_merge(array_keys($data_keluar), array_keys($data_masuk)));
+rsort($semua_bulan);
+$semua_bulan = array_slice($semua_bulan, 0, 6);
+
+$laporan_bulan = [];
+foreach ($semua_bulan as $b) {
+    $keluar = $data_keluar[$b]['keluar'] ?? 0;
+    $masuk  = $data_masuk[$b] ?? 0;
+    $label  = $data_keluar[$b]['label'] ?? date('F Y', strtotime($b . '-01'));
+    $laporan_bulan[] = [
+        'bulan'  => $b,
+        'label'  => $label,
+        'keluar' => $keluar,
+        'masuk'  => $masuk,
+        'laba'   => $keluar - $masuk,
+    ];
+}
+
+// Omset bulan ini (untuk card)
+$q_omset_ini = mysqli_query($conn, "SELECT SUM(total) as omset FROM barang_keluar WHERE DATE_FORMAT(tanggal,'%Y-%m') = '$bulan_ini'");
+$omset_ini   = mysqli_fetch_assoc($q_omset_ini)['omset'] ?? 0;
+$q_modal_ini = mysqli_query($conn, "
+    SELECT SUM(dbm.jumlah * dbm.harga_beli) as modal
+    FROM barang_masuk bm
+    JOIN detail_barang_masuk dbm ON bm.id_masuk = dbm.id_masuk
+    WHERE DATE_FORMAT(bm.tanggal_masuk,'%Y-%m') = '$bulan_ini'
+");
+$modal_ini   = mysqli_fetch_assoc($q_modal_ini)['modal'] ?? 0;
+$laba_ini    = $omset_ini - $modal_ini;
+$omset       = number_format($omset_ini, 0, ',', '.');
+$laba        = number_format($laba_ini, 0, ',', '.');
+$laba_class  = $laba_ini >= 0 ? 'laba-positif' : 'laba-negatif';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -104,9 +166,49 @@ $omset         = number_format(mysqli_fetch_assoc($q_omset)['omset'] ?? 0, 0, ',
             </table>
         </div>
         <div class="content-card">
-            <h3><i class="fa fa-chart-line"></i> Omset Bulan Ini</h3>
-            <div class="omset-value">Rp <?php echo $omset; ?></div>
-            <p class="omset-sub">Total dari semua transaksi keluar</p>
+            <h3><i class="fa fa-chart-line"></i> Laporan Laba per Bulan</h3>
+
+            <div class="omset-bulan-ini">
+                <div class="omset-row">
+                    <span class="omset-label"><i class="fas fa-arrow-up" style="color:#22c55e;"></i> Penjualan Bulan Ini</span>
+                    <span class="omset-val">Rp <?php echo $omset; ?></span>
+                </div>
+                <div class="omset-row">
+                    <span class="omset-label"><i class="fas fa-arrow-down" style="color:#ef4444;"></i> Pembelian Bulan Ini</span>
+                    <span class="omset-val">Rp <?php echo number_format($modal_ini, 0, ',', '.'); ?></span>
+                </div>
+                <div class="omset-row omset-laba">
+                    <span class="omset-label"><i class="fas fa-wallet"></i> Laba Bersih</span>
+                    <span class="omset-val <?php echo $laba_class; ?>">Rp <?php echo $laba; ?></span>
+                </div>
+            </div>
+
+            <?php if (!empty($laporan_bulan)): ?>
+            <div class="tabel-bulan-wrap">
+                <table class="tabel-bulan">
+                    <thead>
+                        <tr>
+                            <th>Bulan</th>
+                            <th>Penjualan</th>
+                            <th>Pembelian</th>
+                            <th>Laba</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($laporan_bulan as $lb): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($lb['label']) ?></td>
+                            <td class="num">Rp <?= number_format($lb['keluar'], 0, ',', '.') ?></td>
+                            <td class="num">Rp <?= number_format($lb['masuk'],  0, ',', '.') ?></td>
+                            <td class="num <?= $lb['laba'] >= 0 ? 'laba-positif' : 'laba-negatif' ?>">
+                                <?= $lb['laba'] >= 0 ? '+' : '' ?>Rp <?= number_format(abs($lb['laba']), 0, ',', '.') ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
