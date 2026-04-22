@@ -1,224 +1,316 @@
 <?php
-$conn = mysqli_connect("localhost", "root", "", "balnis_db");
+session_start();
+if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+include 'konek.php';
 
-// ================== SIMPAN ==================
+$notif = null; // ['type' => 'success|danger|warning', 'msg' => '...']
+
+/* ─── SIMPAN ──────────────────────────────── */
 if (isset($_POST['simpan'])) {
     $tanggal   = $_POST['tanggal'];
-    $id_barang = $_POST['id_barang'];
-    $jumlah    = $_POST['jumlah'];
-
-    $barang = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT * FROM inventori_barang WHERE id_barang='$id_barang'"
-    ));
-
-    $harga = $barang['harga_jual'];
-    $stok  = $barang['stok'];
+    $id_barang = (int) $_POST['id_barang'];
+    $jumlah    = (int) $_POST['jumlah'];
 
     if ($jumlah <= 0) {
-        echo "<script>alert('Jumlah harus lebih dari 0');</script>";
-    } elseif ($jumlah > $stok) {
-        echo "<script>alert('Stok tidak cukup!');</script>";
+        $notif = ['type' => 'warning', 'msg' => 'Jumlah harus lebih dari 0.'];
     } else {
-        $total = $jumlah * $harga;
+        // Ambil data barang dengan prepared statement
+        $stmt = $conn->prepare("SELECT harga_jual, stok, nama_barang FROM inventori_barang WHERE id_barang = ?");
+        $stmt->bind_param("i", $id_barang);
+        $stmt->execute();
+        $barang = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
 
-        mysqli_query($conn, "
-            INSERT INTO barang_keluar (tanggal, id_barang, jumlah, total)
-            VALUES ('$tanggal', '$id_barang', '$jumlah', '$total')
-        ");
+        if (!$barang) {
+            $notif = ['type' => 'danger', 'msg' => 'Barang tidak ditemukan.'];
+        } elseif ($jumlah > $barang['stok']) {
+            $notif = ['type' => 'warning', 'msg' => "Stok tidak cukup! Stok tersedia: {$barang['stok']} unit."];
+        } else {
+            $total = $jumlah * $barang['harga_jual'];
 
-        mysqli_query($conn, "
-            UPDATE inventori_barang
-            SET stok = stok - $jumlah
-            WHERE id_barang = '$id_barang'
-        ");
+            // Insert ke barang_keluar
+            $ins = $conn->prepare("INSERT INTO barang_keluar (tanggal, id_barang, jumlah, total) VALUES (?, ?, ?, ?)");
+            $ins->bind_param("siid", $tanggal, $id_barang, $jumlah, $total);
 
-        echo "<script>alert('Transaksi berhasil!');</script>";
+            // Kurangi stok
+            $upd = $conn->prepare("UPDATE inventori_barang SET stok = stok - ? WHERE id_barang = ?");
+            $upd->bind_param("ii", $jumlah, $id_barang);
+
+            if ($ins->execute() && $upd->execute()) {
+                $notif = ['type' => 'success', 'msg' => "Transaksi berhasil! <strong>{$barang['nama_barang']}</strong> x{$jumlah} — Rp " . number_format($total, 0, ',', '.')];
+            } else {
+                $notif = ['type' => 'danger', 'msg' => 'Gagal menyimpan transaksi. Coba lagi.'];
+            }
+            $ins->close(); $upd->close();
+        }
     }
 }
 
-// ================== HAPUS ==================
+/* ─── HAPUS ───────────────────────────────── */
 if (isset($_GET['hapus'])) {
-    $id = $_GET['hapus'];
+    $id = (int) $_GET['hapus'];
 
-    $data = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT * FROM barang_keluar WHERE id_keluar='$id'"
-    ));
+    $stmt = $conn->prepare("SELECT id_barang, jumlah FROM barang_keluar WHERE id_keluar = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
 
-    $id_barang = $data['id_barang'];
-    $jumlah    = $data['jumlah'];
+    if ($data) {
+        $upd = $conn->prepare("UPDATE inventori_barang SET stok = stok + ? WHERE id_barang = ?");
+        $upd->bind_param("ii", $data['jumlah'], $data['id_barang']);
+        $upd->execute(); $upd->close();
 
-    mysqli_query($conn, "
-        UPDATE inventori_barang
-        SET stok = stok + $jumlah
-        WHERE id_barang = '$id_barang'
-    ");
+        $del = $conn->prepare("DELETE FROM barang_keluar WHERE id_keluar = ?");
+        $del->bind_param("i", $id);
+        $del->execute(); $del->close();
 
-    mysqli_query($conn, "DELETE FROM barang_keluar WHERE id_keluar='$id'");
-
-    echo "<script>alert('Data dihapus & stok dikembalikan!');</script>";
+        $notif = ['type' => 'success', 'msg' => 'Data dihapus &amp; stok dikembalikan.'];
+    }
 }
-?>
 
+/* ─── DATA UNTUK HALAMAN ──────────────────── */
+$res_barang = mysqli_query($conn, "SELECT * FROM inventori_barang ORDER BY nama_barang ASC");
+
+$res_riwayat = mysqli_query($conn, "
+    SELECT bk.id_keluar, bk.tanggal, bk.jumlah, bk.total, ib.nama_barang, ib.harga_jual
+    FROM barang_keluar bk
+    JOIN inventori_barang ib ON bk.id_barang = ib.id_barang
+    ORDER BY bk.id_keluar DESC
+");
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Transaksi Penjualan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barang Keluar - Sistem Inventaris</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="barang_keluar.css">
+    <link rel="stylesheet" href="responsive.css">
 </head>
-
 <body>
 
-<!-- ===== SIDEBAR ===== -->
-<div class="sidebar">
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- ─── SIDEBAR ─────────────────────────── -->
+<div class="sidebar" id="sidebar">
     <div class="admin-profile">
         <i class="fas fa-user-circle"></i>
-        <span>Admin</span>
+        <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
     </div>
-
     <a href="dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a>
     <a href="inventori.php"><i class="fas fa-boxes"></i> Inventori</a>
-
     <h3>TRANSAKSI</h3>
-    <a href="pembelian.php"><i class="fas fa-shopping-cart"></i> Barang Masuk</a>
-    <a href="barang_keluar.php" class="active"><i class="fas fa-file-invoice"></i> Barang Keluar</a>
-
+    <a href="barang_masuk.php"><i class="fas fa-shopping-cart"></i> Barang Masuk</a>
+    <a href="barang_keluar.php" class="active"><i class="fas fa-file-export"></i> Barang Keluar</a>
     <h3>REPORT</h3>
-    <a href="laporan_pembelian.php"><i class="fas fa-chart-line"></i> Laporan Barang Masuk</a>
-    <a href="laporan_penjualan.php"><i class="fas fa-chart-bar"></i> Laporan Barang Keluar</a>
-
-    <a href="logout.php" class="logout-btn">
-        <i class="fas fa-sign-out-alt"></i> Logout
-    </a>
+    <a href="laporan_barangmasuk.php"><i class="fas fa-chart-line"></i> Laporan Barang Masuk</a>
+    <a href="laporanBarangKeluar.php"><i class="fas fa-chart-bar"></i> Laporan Barang Keluar</a>
+    <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
-<!-- ===== MAIN WRAPPER ===== -->
+<!-- ─── MAIN ─────────────────────────────── -->
 <div class="main-wrapper">
 
-    <!-- Header -->
     <header>
-        <div style="font-weight: bold;"><i class="fa fa-bars"></i> TRANSAKSI PENJUALAN</div>
-        <div>Admin <i class="fa fa-user-circle"></i></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <button class="hamburger" id="hamburger" aria-label="Menu"><span></span></button>
+            <span><i class="fas fa-file-export"></i> BARANG KELUAR</span>
+        </div>
+        <div style="font-size:0.875rem;font-weight:500;color:#718096;">
+            <?php echo htmlspecialchars($_SESSION['username']); ?>
+            <i class="fa fa-user-circle" style="color:#1565c0;margin-left:4px;"></i>
+        </div>
     </header>
 
-    <!-- Form Input -->
-    <div class="content-card">
-        <div class="card-header">
-            <h3><i class="fas fa-plus-circle"></i> Input Penjualan</h3>
-        </div>
+    <!-- Notifikasi -->
+    <?php if ($notif): ?>
+    <div class="alert alert-<?= $notif['type'] ?>">
+        <i class="fas fa-<?= $notif['type']==='success' ? 'check-circle' : ($notif['type']==='warning' ? 'exclamation-triangle' : 'times-circle') ?>"></i>
+        <?= $notif['msg'] ?>
+    </div>
+    <?php endif; ?>
 
-        <form method="POST">
+    <!-- ─── FORM INPUT ──────────────────── -->
+    <div class="content-card">
+        <h3><i class="fas fa-plus-circle"></i> Input Penjualan / Barang Keluar</h3>
+
+        <form method="POST" id="formKeluar">
             <div class="form-grid">
 
-                <div class="form-group">
+                <div>
                     <label>Tanggal</label>
-                    <input type="date" name="tanggal" required>
+                    <input type="date" name="tanggal" id="tanggal"
+                           value="<?= date('Y-m-d') ?>" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Barang</label>
+                <div>
+                    <label>Pilih Barang</label>
                     <select name="id_barang" id="id_barang" required>
                         <option value="">-- Pilih Barang --</option>
                         <?php
-                        $barang = mysqli_query($conn, "SELECT * FROM inventori_barang");
-                        while ($b = mysqli_fetch_assoc($barang)) {
-                            echo "<option value='{$b['id_barang']}' data-harga='{$b['harga_jual']}'>
-                                    {$b['nama_barang']} | Stok: {$b['stok']} | Rp " . number_format($b['harga_jual'], 0, ',', '.') . "
-                                  </option>";
-                        }
+                        $barang_list = [];
+                        while ($b = mysqli_fetch_assoc($res_barang)):
+                            $barang_list[$b['id_barang']] = $b;
                         ?>
+                        <option value="<?= $b['id_barang'] ?>"
+                                data-harga="<?= $b['harga_jual'] ?>"
+                                data-stok="<?= $b['stok'] ?>"
+                                data-nama="<?= htmlspecialchars($b['nama_barang']) ?>">
+                            <?= htmlspecialchars($b['nama_barang']) ?>
+                            &nbsp;|&nbsp; Stok: <?= $b['stok'] ?>
+                            &nbsp;|&nbsp; Rp <?= number_format($b['harga_jual'], 0, ',', '.') ?>
+                        </option>
+                        <?php endwhile; ?>
                     </select>
+                    <div class="stok-info" id="stokInfo"></div>
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Jumlah</label>
-                    <input type="number" name="jumlah" id="jumlah" min="1" required>
+                    <input type="number" name="jumlah" id="jumlah" min="1" placeholder="0" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Total Harga</label>
-                    <input type="text" id="total_display" placeholder="Rp 0" readonly class="input-total">
+                <div>
+                    <label>Total Harga (otomatis)</label>
+                    <input type="text" id="total_display" placeholder="Rp 0"
+                           readonly class="input-total">
                     <input type="hidden" name="total_harga" id="total_harga">
                 </div>
 
             </div>
 
             <button type="submit" name="simpan" class="btn-submit">
-                <i class="fas fa-save"></i> Simpan
+                <i class="fas fa-save"></i> Simpan Transaksi
             </button>
         </form>
     </div>
 
-    <!-- Tabel Riwayat -->
-    <div class="content-card" style="margin-top: 25px;">
-        <div class="card-header">
-            <h3><i class="fas fa-list"></i> Riwayat Penjualan</h3>
+    <!-- ─── TABEL RIWAYAT ───────────────── -->
+    <div class="content-card">
+        <h3><i class="fas fa-history"></i> Riwayat Penjualan</h3>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Barang</th>
+                        <th>Jumlah</th>
+                        <th>Harga Satuan</th>
+                        <th>Total</th>
+                        <th style="text-align:center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $no = 1;
+                    while ($row = mysqli_fetch_assoc($res_riwayat)): ?>
+                    <tr>
+                        <td style="color:var(--text-muted);font-size:0.8rem;"><?= $no++ ?></td>
+                        <td style="font-family:'DM Mono',monospace;font-size:0.82rem;color:#718096;">
+                            <?= date('d/m/Y', strtotime($row['tanggal'])) ?>
+                        </td>
+                        <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+                        <td><?= $row['jumlah'] ?></td>
+                        <td style="font-family:'DM Mono',monospace;font-size:0.82rem;">
+                            Rp <?= number_format($row['harga_jual'], 0, ',', '.') ?>
+                        </td>
+                        <td class="total-bold">Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
+                        <td style="text-align:center;">
+                            <a href="barang_keluar.php?hapus=<?= $row['id_keluar'] ?>"
+                               onclick="return confirm('Hapus data ini? Stok akan dikembalikan.')"
+                               class="btn-del">
+                                <i class="fas fa-trash"></i> Hapus
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Tanggal</th>
-                    <th>Barang</th>
-                    <th>Jumlah</th>
-                    <th>Total</th>
-                    <th class="text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $no   = 1;
-                $data = mysqli_query($conn, "
-                    SELECT bk.*, ib.nama_barang
-                    FROM barang_keluar bk
-                    JOIN inventori_barang ib ON bk.id_barang = ib.id_barang
-                    ORDER BY bk.id_keluar DESC
-                ");
-
-                while ($row = mysqli_fetch_assoc($data)) :
-                ?>
-                <tr>
-                    <td><?= $no++ ?></td>
-                    <td><?= $row['tanggal'] ?></td>
-                    <td><?= $row['nama_barang'] ?></td>
-                    <td><?= $row['jumlah'] ?></td>
-                    <td>Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
-                    <td class="text-center">
-                        <a href="?hapus=<?= $row['id_keluar'] ?>"
-                           onclick="return confirm('Hapus data ini?')"
-                           class="btn-action btn-delete">
-                            <i class="fas fa-trash"></i> Hapus
-                        </a>
-                    </td>
-                </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
     </div>
 
 </div><!-- /.main-wrapper -->
 
 <script>
-    const selectBarang = document.getElementById('id_barang');
-    const inputJumlah  = document.getElementById('jumlah');
-    const totalDisplay = document.getElementById('total_display');
-    const totalHarga   = document.getElementById('total_harga');
+/* ─── Hamburger ───────────────────────────── */
+const hamburger = document.getElementById('hamburger');
+const sidebar   = document.getElementById('sidebar');
+const overlay   = document.getElementById('overlay');
 
-    function hitungTotal() {
-        const harga  = parseFloat(selectBarang.selectedOptions[0]?.dataset.harga) || 0;
-        const jumlah = parseFloat(inputJumlah.value) || 0;
-        const total  = harga * jumlah;
+function openSidebar()  {
+    sidebar.classList.add('open');
+    overlay.classList.add('active');
+    hamburger.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+    hamburger.classList.remove('open');
+    document.body.style.overflow = '';
+}
 
-        totalHarga.value   = total;
-        totalDisplay.value = total > 0
-            ? 'Rp ' + total.toLocaleString('id-ID')
-            : 'Rp 0';
+hamburger.addEventListener('click', () =>
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
+);
+overlay.addEventListener('click', closeSidebar);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+/* ─── Hitung Total & Info Stok ────────────── */
+const selectBarang = document.getElementById('id_barang');
+const inputJumlah  = document.getElementById('jumlah');
+const totalDisplay = document.getElementById('total_display');
+const totalHarga   = document.getElementById('total_harga');
+const stokInfo     = document.getElementById('stokInfo');
+
+function updateUI() {
+    const opt    = selectBarang.selectedOptions[0];
+    const harga  = parseFloat(opt?.dataset.harga)  || 0;
+    const stok   = parseInt(opt?.dataset.stok)     || 0;
+    const nama   = opt?.dataset.nama               || '';
+    const jumlah = parseInt(inputJumlah.value)     || 0;
+    const total  = harga * jumlah;
+
+    // Info stok
+    if (nama) {
+        if (stok === 0) {
+            stokInfo.textContent = `Stok habis!`;
+            stokInfo.className   = 'stok-info kritis';
+        } else if (stok <= 10) {
+            stokInfo.textContent = `Stok tersisa: ${stok} unit (menipis)`;
+            stokInfo.className   = 'stok-info menipis';
+        } else {
+            stokInfo.textContent = `Stok tersisa: ${stok} unit`;
+            stokInfo.className   = 'stok-info aman';
+        }
+        // Batasi max input jumlah sesuai stok
+        inputJumlah.max = stok;
+    } else {
+        stokInfo.textContent = '';
+        stokInfo.className   = 'stok-info';
     }
 
-    selectBarang.addEventListener('change', hitungTotal);
-    inputJumlah.addEventListener('input', hitungTotal);
+    // Total
+    totalHarga.value   = total;
+    totalDisplay.value = total > 0
+        ? 'Rp ' + total.toLocaleString('id-ID')
+        : 'Rp 0';
+}
+
+selectBarang.addEventListener('change', updateUI);
+inputJumlah.addEventListener('input',  updateUI);
+
+/* ─── Auto-dismiss notif setelah 5 detik ─── */
+const alert = document.querySelector('.alert');
+if (alert) setTimeout(() => {
+    alert.style.transition = 'opacity 0.5s';
+    alert.style.opacity    = '0';
+    setTimeout(() => alert.remove(), 500);
+}, 5000);
 </script>
 
 </body>

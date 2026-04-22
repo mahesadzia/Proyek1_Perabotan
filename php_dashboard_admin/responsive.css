@@ -1,0 +1,226 @@
+/* =====================================================
+   RESPONSIVE.CSS — Mobile-first breakpoints
+   Di-import oleh semua halaman setelah CSS utama
+   ===================================================== */
+
+/* ─── HAMBURGER BUTTON (hidden di desktop) ─────────── */
+.hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+.hamburger:hover { background: var(--primary-light, #e3f0ff); }
+.hamburger span,
+.hamburger span::before,
+.hamburger span::after {
+    display: block;
+    width: 22px;
+    height: 2.5px;
+    background: var(--primary, #1565c0);
+    border-radius: 2px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+.hamburger span::before,
+.hamburger span::after {
+    content: '';
+    position: absolute;
+    left: 0;
+}
+.hamburger span::before { top: -7px; }
+.hamburger span::after  { top:  7px; }
+
+/* Animasi X saat sidebar terbuka */
+.hamburger.open span { background: transparent; }
+.hamburger.open span::before { transform: rotate(45deg); top: 0; }
+.hamburger.open span::after  { transform: rotate(-45deg); top: 0; }
+
+/* ─── OVERLAY (tap di luar sidebar untuk menutup) ─── */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 90;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.sidebar-overlay.active { opacity: 1; }
+
+/* ─── TABLET  ≤ 1024px ──────────────────────────────── */
+@media (max-width: 1024px) {
+
+    /* Stats grid: 2 kolom */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        padding: 20px 20px 0 !important;
+        gap: 14px !important;
+    }
+
+    /* Bottom grid: 1 kolom */
+    .bottom-grid {
+        grid-template-columns: 1fr !important;
+        padding: 16px 20px 20px !important;
+        gap: 14px !important;
+    }
+
+    /* Content grid barang masuk: 1 kolom */
+    .content-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+    }
+
+    /* Card & content-card margin */
+    .card { margin: 16px 20px !important; }
+    .content-card { margin: 16px 20px !important; }
+    .page-title  { padding: 16px 20px 0 !important; }
+    .main { padding: 0 !important; }
+}
+
+/* ─── MOBILE  ≤ 768px ───────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* Tampilkan hamburger */
+    .hamburger { display: flex; }
+
+    /* Sembunyikan sidebar secara default — geser ke kiri */
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 200;
+    }
+
+    /* Sidebar terbuka */
+    .sidebar.open { transform: translateX(0); }
+
+    /* Tampilkan overlay saat sidebar terbuka */
+    .sidebar-overlay { display: block; }
+
+    /* Main content full width */
+    .main-wrapper,
+    .main {
+        margin-left: 0 !important;
+    }
+
+    /* Header: tampilkan hamburger */
+    header {
+        padding: 14px 16px !important;
+        gap: 10px;
+    }
+
+    /* Page title lebih kecil */
+    .page-title {
+        padding: 16px 16px 0 !important;
+        font-size: 1.1rem !important;
+    }
+
+    /* Stats grid: 1 kolom di HP kecil */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        padding: 14px 16px 0 !important;
+        gap: 10px !important;
+    }
+
+    .card { margin: 10px 16px !important; padding: 16px !important; }
+    .card h2 { font-size: 24px !important; }
+
+    /* Bottom grid */
+    .bottom-grid {
+        padding: 10px 16px 16px !important;
+        gap: 10px !important;
+    }
+
+    .content-card {
+        margin: 10px 16px !important;
+        padding: 16px !important;
+    }
+
+    /* ── TABLE: card-style di mobile ── */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Tabel inventori & laporan: scroll horizontal */
+    table {
+        min-width: 560px;
+    }
+
+    th, td { padding: 10px 12px !important; font-size: 0.8rem !important; }
+
+    /* Card header */
+    .card-header {
+        padding: 14px 16px !important;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Form */
+    .content-grid { gap: 0 !important; }
+
+    .content-card { padding: 16px !important; }
+
+    input, select {
+        padding: 11px 12px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .btn-submit { padding: 13px !important; font-size: 0.9rem !important; }
+
+    /* Filter form laporan */
+    .filter-form {
+        padding: 14px 16px !important;
+        gap: 10px !important;
+    }
+
+    .filter-form > div { width: 100%; }
+
+    .input-tgl { width: 100% !important; }
+
+    .filter-form button { width: 100%; justify-content: center; }
+
+    .filter-info { margin-left: 0 !important; width: 100%; }
+
+    /* Modal full-screen di mobile */
+    .modal-content {
+        width: 92% !important;
+        margin: 16px auto !important;
+        padding: 20px !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    /* Laporan keluar */
+    .page-title h1 { font-size: 1.2rem !important; }
+    .page-title { padding: 14px 16px 0 !important; }
+
+    /* Omset value */
+    .omset-value { font-size: 26px !important; }
+
+    /* Login */
+    .login-container { width: 95% !important; padding: 28px 20px !important; }
+
+    /* Register */
+    .register-container { padding: 24px 16px !important; }
+    .role-group { flex-direction: column !important; }
+}
+
+/* ─── SMALL MOBILE  ≤ 400px ─────────────────────────── */
+@media (max-width: 400px) {
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    header { padding: 12px !important; }
+    .card h2 { font-size: 20px !important; }
+}
+
+/* ─── PRINT ─────────────────────────────────────────── */
+@media print {
+    .hamburger, .sidebar-overlay { display: none !important; }
+}

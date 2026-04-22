@@ -68,13 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php if (!empty($success)): ?>
             <div class="success-message">
                 <i class="fas fa-check-circle"></i>
-                <?php echo $success; ?>
+                <?php echo $success; /* Sengaja tidak di-escape karena mengandung link HTML yang dikontrol dari kode */ ?>
             </div>
         <?php else: ?>
             <?php if (!empty($error)): ?>
                 <div class="error-message">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <?php echo htmlspecialchars($error); ?>
+                    <?php echo $error; /* Sengaja tidak di-escape karena pesan error dikontrol dari kode, bukan input user */ ?>
                 </div>
             <?php endif; ?>
 
@@ -108,17 +108,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label class="role-option admin-role" for="role-admin">
                             <input type="radio" id="role-admin" name="role" value="admin" 
                                    <?php echo (isset($_POST['role']) && $_POST['role']=='admin') ? 'checked' : ''; ?> required>
-                            <i class="fas fa-user-shield"></i>
-                            <span>Admin</span>
-                            <div class="role-badge">Full Access</div>
+                            <div class="role-content">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Admin</span>
+                                <div class="role-badge">Full Access</div>
+                            </div>
                         </label>
                         
                         <label class="role-option karyawan-role" for="role-karyawan">
                             <input type="radio" id="role-karyawan" name="role" value="karyawan" 
                                    <?php echo (!isset($_POST['role']) || $_POST['role']=='karyawan') ? 'checked' : ''; ?> required>
-                            <i class="fas fa-user"></i>
-                            <span>Karyawan</span>
-                            <div class="role-badge">Limited</div>
+                            <div class="role-content">
+                                <i class="fas fa-user"></i>
+                                <span>Karyawan</span>
+                                <div class="role-badge">Limited</div>
+                            </div>
                         </label>
                     </div>
                 </div>
@@ -201,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 document.querySelectorAll('.role-option').forEach(option => {
                     option.classList.remove('selected');
                 });
-                this.parentElement.classList.add('selected');
+                this.closest('.role-option').classList.add('selected');
             });
         });
 
