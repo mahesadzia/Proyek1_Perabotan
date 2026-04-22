@@ -3,6 +3,17 @@ session_start();
 if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
 include 'konek.php';
 
+// ─── Data user yang sedang login ──────────────────────────────────────────────
+$uid = $_SESSION['user_id'];
+$q_user = $conn->prepare("SELECT username, email, role, status, last_login, created_at FROM users WHERE id = ?");
+$q_user->bind_param("i", $uid);
+$q_user->execute();
+$user_data = $q_user->get_result()->fetch_assoc();
+$q_user->close();
+$inisial = strtoupper(substr($user_data['username'] ?? 'A', 0, 1));
+
+
+
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
     $stmt = $conn->prepare("DELETE FROM inventori_barang WHERE id_barang = ?");
@@ -11,10 +22,10 @@ if (isset($_GET['hapus'])) {
 }
 
 if (isset($_POST['tambah'])) {
-    $nama = $_POST['nama_barang']; $beli = $_POST['harga_beli'];
-    $jual = $_POST['harga_jual'];  $stok = $_POST['stok'];
-    $stmt = $conn->prepare("INSERT INTO inventori_barang (nama_barang, harga_beli, harga_jual, stok) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("sddi", $nama, $beli, $jual, $stok);
+    $nama = $_POST['nama_barang'];
+    $stok = 0; // stok awal selalu 0; harga diisi via barang masuk/keluar
+    $stmt = $conn->prepare("INSERT INTO inventori_barang (nama_barang, harga_beli, harga_jual, stok) VALUES (?, 0, 0, ?)");
+    $stmt->bind_param("si", $nama, $stok);
     $stmt->execute(); $stmt->close();
     header("Location: inventori.php"); exit;
 }
@@ -67,8 +78,55 @@ $result = mysqli_query($conn, "SELECT * FROM inventori_barang");
             <button class="hamburger" id="hamburger" aria-label="Menu"><span></span></button>
             <span><i class="fas fa-boxes"></i> MANAJEMEN STOK</span>
         </div>
-        <div style="font-size:0.875rem;font-weight:500;color:#718096;">
-            <?php echo htmlspecialchars($_SESSION['username']); ?> <i class="fa fa-user-circle" style="color:#1565c0;"></i>
+        <div style="position:relative;">
+            <button class="admin-header-btn" id="adminPopupBtn" onclick="toggleAdminPopup()" aria-haspopup="true">
+                <div class="avatar-circle"><?php echo $inisial; ?></div>
+                <span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?php echo htmlspecialchars($user_data['username']); ?></span>
+                <i class="fas fa-chevron-down chevron-icon"></i>
+            </button>
+            <div class="admin-popup" id="adminPopup">
+                <div class="popup-header">
+                    <div class="popup-avatar-large"><?php echo $inisial; ?></div>
+                    <div class="popup-header-info">
+                        <div class="popup-name"><?php echo htmlspecialchars($user_data['username']); ?></div>
+                        <div class="popup-role-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <?php echo ucfirst($user_data['role'] ?? 'admin'); ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup-body">
+                    <div class="popup-row">
+                        <i class="fas fa-envelope"></i>
+                        <span class="popup-row-val"><?php echo htmlspecialchars($user_data['email'] ?? '-'); ?></span>
+                    </div>
+                    <div class="popup-row">
+                        <i class="fas fa-circle" style="color:#48bb78;font-size:0.6rem;"></i>
+                        <span>Status:&nbsp;</span>
+                        <span class="popup-row-val"><span class="status-dot"></span><?php echo ucfirst($user_data['status'] ?? 'active'); ?></span>
+                    </div>
+                    <div class="popup-row">
+                        <i class="fas fa-clock"></i>
+                        <span>Login terakhir:&nbsp;</span>
+                        <span class="popup-row-val">
+                            <?php echo $user_data['last_login'] ? date('d M Y H:i', strtotime($user_data['last_login'])) : '-'; ?>
+                        </span>
+                    </div>
+                    <div class="popup-row">
+                        <i class="fas fa-calendar-plus"></i>
+                        <span>Bergabung:&nbsp;</span>
+                        <span class="popup-row-val">
+                            <?php echo $user_data['created_at'] ? date('d M Y', strtotime($user_data['created_at'])) : '-'; ?>
+                        </span>
+                    </div>
+                    <div class="popup-divider"></div>
+                </div>
+                <div class="popup-footer">
+                    <a href="logout.php" class="popup-logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Keluar dari Akun
+                    </a>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -122,14 +180,16 @@ $result = mysqli_query($conn, "SELECT * FROM inventori_barang");
 <div id="modalTambah" class="modal">
     <div class="modal-content">
         <h3><i class="fas fa-plus" style="color:#1565c0;margin-right:8px;"></i>Tambah Barang Baru</h3>
+        <div class="modal-info-note">
+            <i class="fas fa-info-circle"></i>
+            Harga beli &amp; jual akan diisi saat transaksi <b>Barang Masuk</b> atau <b>Barang Keluar</b>.
+        </div>
         <form method="POST">
-            <input type="text"   name="nama_barang" placeholder="Nama Barang"  required>
-            <input type="number" name="harga_beli"  placeholder="Harga Beli"   required>
-            <input type="number" name="harga_jual"  placeholder="Harga Jual"   required>
-            <input type="number" name="stok"        placeholder="Stok Awal"    required>
+            <label style="font-size:0.8rem;font-weight:600;color:#4a5568;margin-bottom:4px;display:block;">Nama Barang <span style="color:#e53e3e;">*</span></label>
+            <input type="text" name="nama_barang" placeholder="Contoh: Kursi Sofa 3 Seater" required autocomplete="off" style="width:100%;">
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" onclick="closeModal('modalTambah')">Batal</button>
-                <button type="submit" name="tambah" class="btn-blue">Simpan</button>
+                <button type="submit" name="tambah" class="btn-blue"><i class="fas fa-save"></i> Simpan Barang</button>
             </div>
         </form>
     </div>
@@ -164,6 +224,28 @@ function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.re
 hamburger.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
 overlay.addEventListener('click', closeSidebar);
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeSidebar(); });
+function toggleAdminPopup() {
+    const btn   = document.getElementById('adminPopupBtn');
+    const popup = document.getElementById('adminPopup');
+    if (!btn || !popup) return;
+    const isOpen = popup.classList.contains('popup-show');
+    if (isOpen) {
+        popup.classList.remove('popup-show');
+        btn.classList.remove('popup-open');
+    } else {
+        popup.classList.add('popup-show');
+        btn.classList.add('popup-open');
+    }
+}
+document.addEventListener('click', function(e) {
+    const btn   = document.getElementById('adminPopupBtn');
+    const popup = document.getElementById('adminPopup');
+    if (btn && popup && !btn.contains(e.target) && !popup.contains(e.target)) {
+        popup.classList.remove('popup-show');
+        btn.classList.remove('popup-open');
+    }
+});
+
 
 function openModal(id)  { document.getElementById(id).style.display = "block"; }
 function closeModal(id) { document.getElementById(id).style.display = "none"; }

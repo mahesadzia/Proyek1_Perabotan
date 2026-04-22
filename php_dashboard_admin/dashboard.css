@@ -306,3 +306,179 @@ header i { color: var(--primary); margin-right: 8px; }
 
 .tabel-bulan tbody tr:hover { background: #f7faff; }
 .tabel-bulan td.num { font-family: 'DM Mono', monospace; font-size: 0.78rem; text-align: right; }
+
+/* ===== ADMIN BUBBLE POPUP ===== */
+.admin-header-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+    transition: background 0.18s;
+    user-select: none;
+}
+.admin-header-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+.admin-header-btn .avatar-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(21,101,192,0.25);
+}
+.admin-header-btn .chevron-icon {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    transition: transform 0.22s;
+}
+.admin-header-btn.popup-open .chevron-icon {
+    transform: rotate(180deg);
+}
+
+/* Popup bubble */
+.admin-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(21,101,192,0.15), 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid var(--border);
+    z-index: 9999;
+    animation: popupSlide 0.2s cubic-bezier(.34,1.56,.64,1) both;
+    overflow: hidden;
+}
+.admin-popup.popup-show {
+    display: block;
+}
+@keyframes popupSlide {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Popup header */
+.popup-header {
+    background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+    padding: 18px 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.popup-avatar-large {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+.popup-header-info .popup-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+}
+.popup-header-info .popup-role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Popup body rows */
+.popup-body {
+    padding: 12px 0 4px;
+}
+.popup-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 20px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+.popup-row i {
+    width: 16px;
+    text-align: center;
+    color: var(--primary);
+    font-size: 0.82rem;
+}
+.popup-row .popup-row-val {
+    color: var(--text-main);
+    font-weight: 500;
+    flex: 1;
+    word-break: break-all;
+}
+.popup-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 6px 0;
+}
+.popup-footer {
+    padding: 8px 12px 12px;
+}
+.popup-logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 0;
+    background: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+    cursor: pointer;
+}
+.popup-logout-btn:hover {
+    background: #fff0f0;
+    border-color: #fc8181;
+}
+
+/* Status dot */
+.status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #48bb78;
+    margin-right: 4px;
+    vertical-align: middle;
+}
