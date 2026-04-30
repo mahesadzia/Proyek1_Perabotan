@@ -3,9 +3,9 @@ session_start();
 
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] === 'admin') {
-        header("Location: dashboard.php");
+        header("Location: php_dashboard_admin/admin_dashboard.php");
     } else {
-        header("Location: karyawan_dashboard.php");
+        header("Location: php_dashboard_karyawan/dashboard_karyawan.php");
     }
     exit();
 }
@@ -36,9 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['role'] = $user['role'];
                 
                 if ($user['role'] === 'admin') {
-                    header("Location: dashboard.php");
+                    header("Location: php_dashboard_admin/dashboard_admin.php");
                 } else {
-                    header("Location: karyawan_dashboard.php");
+                    header("Location: php_dashboard_karyawan/dashboard_karyawan.php");
                 }
                 exit();
             } else {
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <div class="login-container">
         <div class="logo-section">
-            <img src="../img/logo.png" alt="Logo"> 
+            <img src= "img/logo.png" alt="Logo"> 
             <h1>BALNIS</h1>
         </div>
 

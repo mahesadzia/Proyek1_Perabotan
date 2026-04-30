@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+if (!isset($_SESSION['user_id'])) { header("Location: ../login.php"); exit(); }
 include 'konek.php';
 
 $query_total   = mysqli_query($conn, "SELECT SUM(stok) as total FROM inventori_barang");
@@ -13,8 +13,70 @@ $barang_masuk  = mysqli_fetch_assoc($q_masuk)['total'] ?? 0;
 $q_keluar      = mysqli_query($conn, "SELECT COUNT(*) as total FROM barang_keluar");
 $barang_keluar = mysqli_fetch_assoc($q_keluar)['total'] ?? 0;
 
-$q_omset       = mysqli_query($conn, "SELECT SUM(dbk.jumlah * ib.harga_jual) as omset FROM detail_barang_keluar dbk JOIN inventori_barang ib ON dbk.id_barang = ib.id_barang");
-$omset         = number_format(mysqli_fetch_assoc($q_omset)['omset'] ?? 0, 0, ',', '.');
+// ─── Omset per bulan (keluar - masuk) ─────────────────────────────────────────
+$bulan_ini = date('Y-m');
+
+// Total penjualan (barang keluar) per bulan
+$q_keluar_bulan = mysqli_query($conn, "
+    SELECT DATE_FORMAT(tanggal, '%Y-%m') as bulan,
+           DATE_FORMAT(tanggal, '%M %Y') as label,
+           SUM(total) as total_keluar
+    FROM barang_keluar
+    GROUP BY DATE_FORMAT(tanggal, '%Y-%m')
+    ORDER BY bulan DESC
+    LIMIT 6
+");
+$data_keluar = [];
+while ($r = mysqli_fetch_assoc($q_keluar_bulan)) {
+    $data_keluar[$r['bulan']] = ['label' => $r['label'], 'keluar' => $r['total_keluar']];
+}
+
+// Total pembelian (barang masuk) per bulan
+$q_masuk_bulan = mysqli_query($conn, "
+    SELECT DATE_FORMAT(bm.tanggal_masuk, '%Y-%m') as bulan,
+           SUM(dbm.jumlah * dbm.harga_beli) as total_masuk
+    FROM barang_masuk bm
+    JOIN detail_barang_masuk dbm ON bm.id_masuk = dbm.id_masuk
+    GROUP BY DATE_FORMAT(bm.tanggal_masuk, '%Y-%m')
+");
+$data_masuk = [];
+while ($r = mysqli_fetch_assoc($q_masuk_bulan)) {
+    $data_masuk[$r['bulan']] = $r['total_masuk'];
+}
+
+// Gabungkan semua bulan yang ada
+$semua_bulan = array_unique(array_merge(array_keys($data_keluar), array_keys($data_masuk)));
+rsort($semua_bulan);
+$semua_bulan = array_slice($semua_bulan, 0, 6);
+
+$laporan_bulan = [];
+foreach ($semua_bulan as $b) {
+    $keluar = $data_keluar[$b]['keluar'] ?? 0;
+    $masuk  = $data_masuk[$b] ?? 0;
+    $label  = $data_keluar[$b]['label'] ?? date('F Y', strtotime($b . '-01'));
+    $laporan_bulan[] = [
+        'bulan'  => $b,
+        'label'  => $label,
+        'keluar' => $keluar,
+        'masuk'  => $masuk,
+        'laba'   => $keluar - $masuk,
+    ];
+}
+
+// Omset bulan ini (untuk card)
+$q_omset_ini = mysqli_query($conn, "SELECT SUM(total) as omset FROM barang_keluar WHERE DATE_FORMAT(tanggal,'%Y-%m') = '$bulan_ini'");
+$omset_ini   = mysqli_fetch_assoc($q_omset_ini)['omset'] ?? 0;
+$q_modal_ini = mysqli_query($conn, "
+    SELECT SUM(dbm.jumlah * dbm.harga_beli) as modal
+    FROM barang_masuk bm
+    JOIN detail_barang_masuk dbm ON bm.id_masuk = dbm.id_masuk
+    WHERE DATE_FORMAT(bm.tanggal_masuk,'%Y-%m') = '$bulan_ini'
+");
+$modal_ini   = mysqli_fetch_assoc($q_modal_ini)['modal'] ?? 0;
+$laba_ini    = $omset_ini - $modal_ini;
+$omset       = number_format($omset_ini, 0, ',', '.');
+$laba        = number_format($laba_ini, 0, ',', '.');
+$laba_class  = $laba_ini >= 0 ? 'laba-positif' : 'laba-negatif';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -24,7 +86,7 @@ $omset         = number_format(mysqli_fetch_assoc($q_omset)['omset'] ?? 0, 0, ',
     <title>Dashboard - Sistem Inventaris</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="dashboard_karyawan.css">
     <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
@@ -36,14 +98,11 @@ $omset         = number_format(mysqli_fetch_assoc($q_omset)['omset'] ?? 0, 0, ',
         <i class="fas fa-user-circle"></i>
         <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
     </div>
-    <a href="dashboard.php" class="active"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a href="dashboard_karyawan.php" class="active"><i class="fas fa-th-large"></i> Dashboard</a>
     <a href="inventori.php"><i class="fas fa-boxes"></i> Inventori</a>
     <h3>TRANSAKSI</h3>
     <a href="barang_masuk.php"><i class="fas fa-shopping-cart"></i> Barang Masuk</a>
     <a href="barang_keluar.php"><i class="fas fa-file-export"></i> Barang Keluar</a>
-    <h3>REPORT</h3>
-    <a href="laporan_barangmasuk.php"><i class="fas fa-chart-line"></i> Laporan Barang Masuk</a>
-    <a href="laporanBarangKeluar.php"><i class="fas fa-chart-bar"></i> Laporan Barang Keluar</a>
     <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
@@ -77,12 +136,6 @@ $omset         = number_format(mysqli_fetch_assoc($q_omset)['omset'] ?? 0, 0, ',
             <p>Total Inventori</p>
             <a href="inventori.php">Lihat Detail <i class="fa fa-arrow-circle-right"></i></a>
         </div>
-        <div class="card card-red">
-            <i class="fas fa-file-alt icon-bg"></i>
-            <h2>Laporan</h2>
-            <p>Data Bulanan</p>
-            <a href="laporanBarangKeluar.php">Lihat Laporan <i class="fa fa-arrow-circle-right"></i></a>
-        </div>
     </div>
 
     <div class="bottom-grid">
@@ -102,11 +155,6 @@ $omset         = number_format(mysqli_fetch_assoc($q_omset)['omset'] ?? 0, 0, ',
                 </tr>
                 <?php endwhile; ?>
             </table>
-        </div>
-        <div class="content-card">
-            <h3><i class="fa fa-chart-line"></i> Omset Bulan Ini</h3>
-            <div class="omset-value">Rp <?php echo $omset; ?></div>
-            <p class="omset-sub">Total dari semua transaksi keluar</p>
         </div>
     </div>
 </div>

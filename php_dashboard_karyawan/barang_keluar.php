@@ -100,14 +100,11 @@ $res_riwayat = mysqli_query($conn, "
         <i class="fas fa-user-circle"></i>
         <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
     </div>
-    <a href="admin_dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a href="dashboard_karyawan.php"><i class="fas fa-th-large"></i> Dashboard</a>
     <a href="inventori.php"><i class="fas fa-boxes"></i> Inventori</a>
     <h3>TRANSAKSI</h3>
     <a href="barang_masuk.php"><i class="fas fa-shopping-cart"></i> Barang Masuk</a>
     <a href="barang_keluar.php" class="active"><i class="fas fa-file-export"></i> Barang Keluar</a>
-    <h3>REPORT</h3>
-    <a href="laporan_barangmasuk.php"><i class="fas fa-chart-line"></i> Laporan Barang Masuk</a>
-    <a href="laporan_barangkeluar.php"><i class="fas fa-chart-bar"></i> Laporan Barang Keluar</a>
     <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
