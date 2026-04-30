@@ -269,3 +269,24 @@ tbody tr:hover { background: #f0f7ff; }
 }
 
 .btn-cancel:hover { background: var(--border); }
+
+/* ===== MODAL INFO NOTE (Tambah Barang - hanya nama) ===== */
+.modal-info-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    color: #1e40af;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+.modal-info-note i {
+    color: #3b82f6;
+    font-size: 0.85rem;
+    margin-top: 1px;
+    flex-shrink: 0;
+}

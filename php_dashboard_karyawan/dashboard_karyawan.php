@@ -3,6 +3,15 @@ session_start();
 if (!isset($_SESSION['user_id'])) { header("Location: ../login.php"); exit(); }
 include 'konek.php';
 
+// ─── Data user yang sedang login ──────────────────────────────────────────────
+$uid = $_SESSION['user_id'];
+$q_user = $conn->prepare("SELECT username, email, role, status, last_login, created_at FROM users WHERE id = ?");
+$q_user->bind_param("i", $uid);
+$q_user->execute();
+$user_data = $q_user->get_result()->fetch_assoc();
+$q_user->close();
+$inisial = strtoupper(substr($user_data['username'] ?? 'A', 0, 1));
+
 $query_total   = mysqli_query($conn, "SELECT SUM(stok) as total FROM inventori_barang");
 $total_stok    = mysqli_fetch_assoc($query_total)['total'] ?? 0;
 $query_kritis  = mysqli_query($conn, "SELECT nama_barang, stok FROM inventori_barang ORDER BY stok ASC LIMIT 5");
@@ -112,8 +121,55 @@ $laba_class  = $laba_ini >= 0 ? 'laba-positif' : 'laba-negatif';
             <button class="hamburger" id="hamburger" aria-label="Menu"><span></span></button>
             <span><i class="fas fa-th-large"></i> DASHBOARD</span>
         </div>
-        <div style="font-size:0.875rem;font-weight:500;color:#718096;">
-            <?php echo htmlspecialchars($_SESSION['username']); ?> <i class="fa fa-user-circle" style="color:#1565c0;"></i>
+        <div style="position:relative;">
+            <button class="admin-header-btn" id="adminPopupBtn" onclick="toggleAdminPopup()" aria-haspopup="true">
+                <div class="avatar-circle"><?php echo $inisial; ?></div>
+                <span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?php echo htmlspecialchars($user_data['username']); ?></span>
+                <i class="fas fa-chevron-down chevron-icon"></i>
+            </button>
+            <div class="admin-popup" id="adminPopup">
+                <div class="popup-header">
+                    <div class="popup-avatar-large"><?php echo $inisial; ?></div>
+                    <div class="popup-header-info">
+                        <div class="popup-name"><?php echo htmlspecialchars($user_data['username']); ?></div>
+                        <div class="popup-role-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <?php echo ucfirst($user_data['role'] ?? 'admin'); ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup-body">
+                    <div class="popup-row">
+                        <i class="fas fa-envelope"></i>
+                        <span class="popup-row-val"><?php echo htmlspecialchars($user_data['email'] ?? '-'); ?></span>
+                    </div>
+                    <div class="popup-row">
+                        <i class="fas fa-circle" style="color:#48bb78;font-size:0.6rem;"></i>
+                        <span>Status:&nbsp;</span>
+                        <span class="popup-row-val"><span class="status-dot"></span><?php echo ucfirst($user_data['status'] ?? 'active'); ?></span>
+                    </div>
+                    <div class="popup-row">
+                        <i class="fas fa-clock"></i>
+                        <span>Login terakhir:&nbsp;</span>
+                        <span class="popup-row-val">
+                            <?php echo $user_data['last_login'] ? date('d M Y H:i', strtotime($user_data['last_login'])) : '-'; ?>
+                        </span>
+                    </div>
+                    <div class="popup-row">
+                        <i class="fas fa-calendar-plus"></i>
+                        <span>Bergabung:&nbsp;</span>
+                        <span class="popup-row-val">
+                            <?php echo $user_data['created_at'] ? date('d M Y', strtotime($user_data['created_at'])) : '-'; ?>
+                        </span>
+                    </div>
+                    <div class="popup-divider"></div>
+                </div>
+                <div class="popup-footer">
+                    <a href="logout.php" class="popup-logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Keluar dari Akun
+                    </a>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -156,6 +212,54 @@ $laba_class  = $laba_ini >= 0 ? 'laba-positif' : 'laba-negatif';
                 <?php endwhile; ?>
             </table>
         </div>
+<<<<<<< HEAD:php_dashboard_karyawan/dashboard_karyawan.php
+=======
+        <div class="content-card">
+            <h3><i class="fa fa-chart-line"></i> Laporan Laba per Bulan</h3>
+
+            <div class="omset-bulan-ini">
+                <div class="omset-row">
+                    <span class="omset-label"><i class="fas fa-arrow-up" style="color:#22c55e;"></i> Penjualan Bulan Ini</span>
+                    <span class="omset-val">Rp <?php echo $omset; ?></span>
+                </div>
+                <div class="omset-row">
+                    <span class="omset-label"><i class="fas fa-arrow-down" style="color:#ef4444;"></i> Pembelian Bulan Ini</span>
+                    <span class="omset-val">Rp <?php echo number_format($modal_ini, 0, ',', '.'); ?></span>
+                </div>
+                <div class="omset-row omset-laba">
+                    <span class="omset-label"><i class="fas fa-wallet"></i> Laba Bersih</span>
+                    <span class="omset-val <?php echo $laba_class; ?>">Rp <?php echo $laba; ?></span>
+                </div>
+            </div>
+
+            <?php if (!empty($laporan_bulan)): ?>
+            <div class="tabel-bulan-wrap">
+                <table class="tabel-bulan">
+                    <thead>
+                        <tr>
+                            <th>Bulan</th>
+                            <th>Penjualan</th>
+                            <th>Pembelian</th>
+                            <th>Laba</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($laporan_bulan as $lb): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($lb['label']) ?></td>
+                            <td class="num">Rp <?= number_format($lb['keluar'], 0, ',', '.') ?></td>
+                            <td class="num">Rp <?= number_format($lb['masuk'],  0, ',', '.') ?></td>
+                            <td class="num <?= $lb['laba'] >= 0 ? 'laba-positif' : 'laba-negatif' ?>">
+                                <?= $lb['laba'] >= 0 ? '+' : '' ?>Rp <?= number_format(abs($lb['laba']), 0, ',', '.') ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
+        </div>
+>>>>>>> 74628a2656664e7c0389cde5a08599a751ff358b:php_dashboard_admin/dashboard.php
     </div>
 </div>
 
@@ -180,6 +284,28 @@ function closeSidebar() {
 hamburger.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
 overlay.addEventListener('click', closeSidebar);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+function toggleAdminPopup() {
+    const btn   = document.getElementById('adminPopupBtn');
+    const popup = document.getElementById('adminPopup');
+    if (!btn || !popup) return;
+    const isOpen = popup.classList.contains('popup-show');
+    if (isOpen) {
+        popup.classList.remove('popup-show');
+        btn.classList.remove('popup-open');
+    } else {
+        popup.classList.add('popup-show');
+        btn.classList.add('popup-open');
+    }
+}
+document.addEventListener('click', function(e) {
+    const btn   = document.getElementById('adminPopupBtn');
+    const popup = document.getElementById('adminPopup');
+    if (btn && popup && !btn.contains(e.target) && !popup.contains(e.target)) {
+        popup.classList.remove('popup-show');
+        btn.classList.remove('popup-open');
+    }
+});
+
 </script>
 </body>
 </html>
