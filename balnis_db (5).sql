@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Waktu pembuatan: 21 Apr 2026 pada 22.03
--- Versi server: 10.4.32-MariaDB
--- Versi PHP: 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: May 06, 2026 at 04:46 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `barang_keluar`
+-- Table structure for table `barang_keluar`
 --
 
 CREATE TABLE `barang_keluar` (
@@ -36,16 +36,19 @@ CREATE TABLE `barang_keluar` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `barang_keluar`
+-- Dumping data for table `barang_keluar`
 --
 
 INSERT INTO `barang_keluar` (`id_keluar`, `tanggal`, `id_barang`, `jumlah`, `total`) VALUES
-(1, '2026-04-21', 2, 15, 3000000);
+(1, '2026-04-21', 2, 15, 3000000),
+(2, '2026-04-22', 7, 15, 60000),
+(4, '2026-04-22', 2, 2, 400000),
+(6, '2026-04-22', 4, 2, 10000);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `barang_masuk`
+-- Table structure for table `barang_masuk`
 --
 
 CREATE TABLE `barang_masuk` (
@@ -56,16 +59,23 @@ CREATE TABLE `barang_masuk` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `barang_masuk`
+-- Dumping data for table `barang_masuk`
 --
 
 INSERT INTO `barang_masuk` (`id_masuk`, `tanggal_masuk`, `id_supplier`, `id_user`) VALUES
-(1, '2026-04-22', 1, 1);
+(1, '2026-04-22', 1, 1),
+(2, '2026-04-06', 10, 4),
+(3, '2026-02-01', 1, 4),
+(4, '2026-02-02', 5, 4),
+(5, '2026-04-22', 1, 4),
+(6, '2026-04-22', 1, 4),
+(7, '2026-04-22', 2, 4),
+(8, '2026-04-22', 4, 4);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `detail_barang_keluar`
+-- Table structure for table `detail_barang_keluar`
 --
 
 CREATE TABLE `detail_barang_keluar` (
@@ -78,7 +88,7 @@ CREATE TABLE `detail_barang_keluar` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `detail_barang_masuk`
+-- Table structure for table `detail_barang_masuk`
 --
 
 CREATE TABLE `detail_barang_masuk` (
@@ -90,16 +100,23 @@ CREATE TABLE `detail_barang_masuk` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `detail_barang_masuk`
+-- Dumping data for table `detail_barang_masuk`
 --
 
 INSERT INTO `detail_barang_masuk` (`id_detail`, `id_masuk`, `id_barang`, `jumlah`, `harga_beli`) VALUES
-(1, 1, 2, 200, 5000);
+(1, 1, 2, 200, 5000),
+(2, 2, 7, 10, 3000),
+(3, 3, 7, 5, 2000),
+(4, 4, 7, 7, 6000),
+(5, 5, 1, 10, 5000),
+(6, 6, 1, 5, 5000),
+(7, 7, 2, 10, 150000),
+(8, 8, 4, 15, 2500);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `inventori_barang`
+-- Table structure for table `inventori_barang`
 --
 
 CREATE TABLE `inventori_barang` (
@@ -111,20 +128,20 @@ CREATE TABLE `inventori_barang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `inventori_barang`
+-- Dumping data for table `inventori_barang`
 --
 
 INSERT INTO `inventori_barang` (`id_barang`, `nama_barang`, `harga_beli`, `harga_jual`, `stok`) VALUES
-(1, 'Ember Besar Plastik', 5000, 7500, 40),
-(2, 'Blender Miyako', 150000, 200000, 215),
-(4, 'Centong Nasi Kayu', 2500, 5000, 0),
-(7, 'sapu lidi', 2000, 4000, 5),
-(9, 'tempat sampah', 10000, 15000, 10);
+(1, 'Ember Besar Plastik', 5000, 7500, 3),
+(2, 'Blender Miyako', 150000, 200000, 7),
+(4, 'Centong Nasi Kayu', 2500, 5000, 13),
+(7, 'sapu lidi', 2000, 4000, 0),
+(9, 'tempat sampah', 10000, 15000, 0);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `supplier`
+-- Table structure for table `supplier`
 --
 
 CREATE TABLE `supplier` (
@@ -135,7 +152,7 @@ CREATE TABLE `supplier` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `supplier`
+-- Dumping data for table `supplier`
 --
 
 INSERT INTO `supplier` (`id_supplier`, `nama_supplier`, `alamat`, `no_hp`) VALUES
@@ -144,51 +161,40 @@ INSERT INTO `supplier` (`id_supplier`, `nama_supplier`, `alamat`, `no_hp`) VALUE
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
+  `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` enum('admin','karyawan') NOT NULL DEFAULT 'karyawan',
-  `status` enum('pending','active','inactive') DEFAULT 'pending',
-  `last_login` datetime DEFAULT NULL,
-  `reset_token` varchar(255) DEFAULT NULL,
-  `reset_expires` datetime DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `role` enum('admin','karyawan') NOT NULL,
+  `status` enum('active','inactive') DEFAULT 'active',
+  `otp_code` varchar(6) DEFAULT NULL,
+  `otp_expires` datetime DEFAULT NULL,
+  `last_login` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `users`
---
-
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `status`, `last_login`, `reset_token`, `reset_expires`, `created_at`, `updated_at`) VALUES
-(2, 'karyawan1', 'karyawan1@balnis.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'karyawan', 'active', NULL, NULL, NULL, '2026-04-08 16:51:45', '2026-04-08 16:51:45'),
-(4, 'admin', 'hilalnafisadilah@gmail.com', '$2y$10$2XhPdvdFuzOG0GlCR2fRHel826RfWc0IiMdfW8DzQenL3tWqjcdxe', 'admin', 'active', '2026-04-09 19:09:55', NULL, NULL, '2026-04-09 02:22:30', '2026-04-09 12:09:55'),
-(5, 'barjen', 'anggatai@gmail.com', '$2y$10$SPINWjJ2/in7Fy1dgH/2.uuY4XptakV.1WucSKr4fSiSKK68x5FQe', 'admin', 'active', '2026-04-09 12:55:38', NULL, NULL, '2026-04-09 05:55:29', '2026-04-09 05:55:38');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indeks untuk tabel `barang_keluar`
+-- Indexes for table `barang_keluar`
 --
 ALTER TABLE `barang_keluar`
   ADD PRIMARY KEY (`id_keluar`),
   ADD KEY `id_barang` (`id_barang`);
 
 --
--- Indeks untuk tabel `barang_masuk`
+-- Indexes for table `barang_masuk`
 --
 ALTER TABLE `barang_masuk`
   ADD PRIMARY KEY (`id_masuk`);
 
 --
--- Indeks untuk tabel `detail_barang_keluar`
+-- Indexes for table `detail_barang_keluar`
 --
 ALTER TABLE `detail_barang_keluar`
   ADD PRIMARY KEY (`id_detail_keluar`),
@@ -196,7 +202,7 @@ ALTER TABLE `detail_barang_keluar`
   ADD KEY `id_barang` (`id_barang`);
 
 --
--- Indeks untuk tabel `detail_barang_masuk`
+-- Indexes for table `detail_barang_masuk`
 --
 ALTER TABLE `detail_barang_masuk`
   ADD PRIMARY KEY (`id_detail`),
@@ -204,87 +210,85 @@ ALTER TABLE `detail_barang_masuk`
   ADD KEY `id_barang` (`id_barang`);
 
 --
--- Indeks untuk tabel `inventori_barang`
+-- Indexes for table `inventori_barang`
 --
 ALTER TABLE `inventori_barang`
   ADD PRIMARY KEY (`id_barang`);
 
 --
--- Indeks untuk tabel `supplier`
+-- Indexes for table `supplier`
 --
 ALTER TABLE `supplier`
   ADD PRIMARY KEY (`id_supplier`);
 
 --
--- Indeks untuk tabel `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`),
-  ADD KEY `idx_username` (`username`),
-  ADD KEY `idx_role` (`role`),
-  ADD KEY `idx_status` (`status`);
+  ADD KEY `idx_email` (`email`),
+  ADD KEY `idx_role_status` (`role`,`status`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `barang_keluar`
+-- AUTO_INCREMENT for table `barang_keluar`
 --
 ALTER TABLE `barang_keluar`
-  MODIFY `id_keluar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_keluar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT untuk tabel `barang_masuk`
+-- AUTO_INCREMENT for table `barang_masuk`
 --
 ALTER TABLE `barang_masuk`
-  MODIFY `id_masuk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_masuk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT untuk tabel `detail_barang_masuk`
+-- AUTO_INCREMENT for table `detail_barang_masuk`
 --
 ALTER TABLE `detail_barang_masuk`
-  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT untuk tabel `inventori_barang`
+-- AUTO_INCREMENT for table `inventori_barang`
 --
 ALTER TABLE `inventori_barang`
   MODIFY `id_barang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT untuk tabel `supplier`
+-- AUTO_INCREMENT for table `supplier`
 --
 ALTER TABLE `supplier`
   MODIFY `id_supplier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT untuk tabel `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+-- Constraints for dumped tables
 --
 
 --
--- Ketidakleluasaan untuk tabel `barang_keluar`
+-- Constraints for table `barang_keluar`
 --
 ALTER TABLE `barang_keluar`
   ADD CONSTRAINT `barang_keluar_ibfk_1` FOREIGN KEY (`id_barang`) REFERENCES `inventori_barang` (`id_barang`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `detail_barang_keluar`
+-- Constraints for table `detail_barang_keluar`
 --
 ALTER TABLE `detail_barang_keluar`
   ADD CONSTRAINT `detail_barang_keluar_ibfk_1` FOREIGN KEY (`id_keluar`) REFERENCES `barang_keluar` (`id_keluar`),
   ADD CONSTRAINT `detail_barang_keluar_ibfk_2` FOREIGN KEY (`id_barang`) REFERENCES `inventori_barang` (`id_barang`);
 
 --
--- Ketidakleluasaan untuk tabel `detail_barang_masuk`
+-- Constraints for table `detail_barang_masuk`
 --
 ALTER TABLE `detail_barang_masuk`
   ADD CONSTRAINT `detail_barang_masuk_ibfk_1` FOREIGN KEY (`id_masuk`) REFERENCES `barang_masuk` (`id_masuk`),
