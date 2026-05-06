@@ -1,5 +1,4 @@
 <?php
-// create_admin.php - JALANKAN SEKALI DI BROWSER
 echo "<!DOCTYPE html><html><head><title>BALNIS Setup</title>";
 echo "<style>body{font-family:Arial;background:#f0f8ff;padding:40px;} .success{background:#d4edda;padding:20px;border-radius:10px;margin:20px 0;}</style></head><body>";
 
@@ -9,7 +8,6 @@ try {
     
     echo "<h2>🚀 BALNIS - SETUP LENGKAP</h2>";
     
-    // 1. BUAT TABEL
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -23,7 +21,6 @@ try {
     )");
     echo "<div class='success'>✅ Tabel <strong>users</strong> siap!</div>";
     
-    // 2. ADMIN AKUN (HANYA 1)
     $admin_email = "admin@balnis.com";
     $admin_pass = "admin123";
     
@@ -39,7 +36,6 @@ try {
         echo "<div>👑 Admin sudah ada</div>";
     }
     
-    // 3. KARYAWAN AKUN (Multiple)
     $karyawans = [
         'hrd@balnis.com' => 'hrd123',
         'finance@balnis.com' => 'finance123',

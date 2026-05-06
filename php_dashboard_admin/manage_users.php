@@ -12,7 +12,6 @@ try {
     $pdo = new PDO("mysql:host=localhost;dbname=balnis_db;charset=utf8", "root", "");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Handle actions
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (isset($_POST['action'])) {
             if ($_POST['action'] == 'add') {
@@ -62,7 +61,6 @@ try {
         }
     }
     
-    // Get all users
     $stmt = $pdo->query("SELECT * FROM users ORDER BY role DESC, created_at DESC");
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -125,17 +123,14 @@ try {
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1><i class="fas fa-users-cog"></i> Kelola Pengguna</h1>
             <a href="admin_dashboard.php" class="btn">← Dashboard</a>
             <a href="../logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
         
-        <!-- Message -->
         <?php echo $message ?? ''; ?>
         
-        <!-- Add User Form -->
         <div class="add-form">
             <h3><i class="fas fa-user-plus"></i> Tambah Pengguna Baru</h3>
             <form method="POST">
@@ -221,7 +216,6 @@ try {
     </div>
 
     <script>
-        // Auto hide alerts after 5 seconds
         setTimeout(() => {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {

@@ -1,4 +1,3 @@
-/* login.css - PERFECT untuk login.php */
 * {
     margin: 0;
     padding: 0;
@@ -153,7 +152,6 @@ body::before {
     color: #00BFFF;
 }
 
-/* Toggle Password (Mata di kanan) */
 .toggle-password {
     position: absolute;
     right: 18px;
@@ -241,7 +239,6 @@ body::before {
     transform: translateY(-1px);
 }
 
-/* Responsive */
 @media (max-width: 480px) {
     .login-container {
         width: 95vw;
@@ -259,7 +256,6 @@ body::before {
     }
 }
 
-/* Sembunyikan ikon browser default */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear,
 input[type="search"]::-webkit-search-decoration,
@@ -269,7 +265,6 @@ input[type="search"]::-webkit-search-results-decoration {
     display: none;
 }
 
-/* Loading animation saat submit */
 form.submitting .login-btn {
     pointer-events: none;
     opacity: 0.8;

@@ -1,5 +1,4 @@
 <?php
-// add_karyawan.php - Letakkan di folder php_dashboard_admin/
 session_start();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -85,7 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <hr style="margin: 30px 0;">
         <h3>Daftar Karyawan Aktif:</h3>
         <?php
-        // Tampilkan daftar karyawan
         $pdo = new PDO("mysql:host=localhost;dbname=balnis_db;charset=utf8", "root", "");
         $stmt = $pdo->prepare("SELECT email, created_at FROM users WHERE role = 'karyawan' AND status = 'active' ORDER BY created_at DESC");
         $stmt->execute();

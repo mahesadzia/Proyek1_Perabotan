@@ -79,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
 
         <script>
-            // Toggle password untuk 2 input
             document.querySelectorAll('input[type="password"]').forEach(input => {
                 input.insertAdjacentHTML('afterend', `<div class="toggle-password" onclick="togglePassword(this)"><i class="fas fa-eye"></i></div>`);
             });

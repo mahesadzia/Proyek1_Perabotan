@@ -10,7 +10,6 @@ if (!isset($_SESSION['reset_email']) || !isset($_SESSION['user_id'])) {
 $reset_email = $_SESSION['reset_email'];
 $user_id = $_SESSION['user_id'];
 
-// Generate/verifikasi kode OTP
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $input_code = trim($_POST['code']);
     
@@ -18,8 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $pdo = new PDO("mysql:host=localhost;dbname=balnis_db;charset=utf8", "root", "");
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        // Cek kode OTP (simpan di session untuk demo)
-        $otp_code = $_SESSION['otp_code'] ?? '123456'; // Demo: selalu 123456
+        $otp_code = $_SESSION['otp_code'] ?? '123456'; 
         
         if ($input_code === $otp_code) {
             unset($_SESSION['reset_email'], $_SESSION['user_id'], $_SESSION['otp_code']);
@@ -34,8 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Generate OTP baru (demo)
-$_SESSION['otp_code'] = '123456'; // Demo OTP
+$_SESSION['otp_code'] = '123456'; 
 ?>
 
 <!DOCTYPE html>

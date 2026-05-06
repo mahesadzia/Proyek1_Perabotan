@@ -23,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $pdo = new PDO("mysql:host=localhost;dbname=balnis_db;charset=utf8", "root", "");
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Cek apakah admin atau karyawan
             $stmt = $pdo->prepare("SELECT id, email, password, role, status FROM users WHERE email = ? AND status = 'active'");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);

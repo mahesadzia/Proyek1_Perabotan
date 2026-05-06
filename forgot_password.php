@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!$user) {
             $error = "Email tidak ditemukan atau akun tidak aktif!";
         } elseif (!empty($old_password)) {
-            // Ganti password dengan old password (untuk admin)
             if (!password_verify($old_password, $user['password'])) {
                 $error = "Password lama salah!";
             } elseif ($new_password !== $confirm_password) {
@@ -33,8 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $success = "Password berhasil diubah!";
             }
         } else {
-            // Verifikasi email untuk reset password (jika lupa password lama)
-            // Di sini bisa ditambahkan pengiriman email verifikasi
             $_SESSION['reset_email'] = $email;
             $_SESSION['user_id'] = $user['id'];
             header("Location: verify_email.php");
@@ -107,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script>
-        // Toggle password visibility
         document.querySelectorAll('input[type="password"]').forEach((input, index) => {
             input.insertAdjacentHTML('afterend', `
                 <div class="toggle-password" onclick="togglePassword(this)">
