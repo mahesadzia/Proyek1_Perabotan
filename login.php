@@ -13,36 +13,38 @@ if (isset($_SESSION['user_id'])) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
     
-    if (empty($username) || empty($password)) {
-        $error = "Username dan password wajib diisi!";
+    if (empty($email) || empty($password)) {
+        $error = "Email dan password wajib diisi!";
     } else {
         try {
             $pdo = new PDO("mysql:host=localhost;dbname=balnis_db;charset=utf8", "root", "");
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            $stmt = $pdo->prepare("SELECT id, username, password, role, status FROM users WHERE username = ? AND status = 'active'");
-            $stmt->execute([$username]);
+            // Cek apakah admin atau karyawan
+            $stmt = $pdo->prepare("SELECT id, email, password, role, status FROM users WHERE email = ? AND status = 'active'");
+            $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user && password_verify($password, $user['password'])) {
+                // Update last_login
                 $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
                 $updateStmt->execute([$user['id']]);
                 
                 $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
                 $_SESSION['role'] = $user['role'];
                 
                 if ($user['role'] === 'admin') {
-                    header("Location: php_dashboard_admin/dashboard_admin.php");
+                    header("Location: php_dashboard_admin/admin_dashboard.php");
                 } else {
                     header("Location: php_dashboard_karyawan/dashboard_karyawan.php");
                 }
                 exit();
             } else {
-                $error = "Username belum terdaftar, password salah, atau akun belum aktif! Silahkan <a href='register.php' style='color:#00BFFF;'>daftar dulu</a>.";
+                $error = "Email atau password salah, atau akun belum aktif!";
             }
         } catch(PDOException $e) {
             $error = "Error server. Coba lagi!";
@@ -62,10 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
-
     <div class="login-container">
         <div class="logo-section">
-            <img src= "img/logo.png" alt="Logo"> 
+            <img src="img/logo.png" alt="Logo"> 
             <h1>BALNIS</h1>
         </div>
 
@@ -78,9 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <form action="" method="post" autocomplete="off">
             <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" name="username" placeholder="Username" required 
-                       value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" placeholder="Email" required 
+                       value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
             </div>
 
             <div class="input-group">
@@ -93,14 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <div class="links-group">
                 <a href="forgot_password.php">Lupa Password?</a>
-                <a href="register.php">Daftar Akun</a>
             </div>
 
             <button type="submit" class="login-btn">MASUK</button>
-            
-            <div class="footer-text">
-                Belum punya akun? <a href="register.php">Klik di sini</a>
-            </div>
         </form>
     </div>
 
