@@ -21,7 +21,7 @@ try {
     )");
     echo "<div class='success'>✅ Tabel <strong>users</strong> siap!</div>";
     
-    $admin_email = "admin@balnis.com";
+    $admin_email = "ekimaulana102@gmail.com";
     $admin_pass = "admin123";
     
     $check_admin = $pdo->prepare("SELECT id FROM users WHERE role = 'admin' AND status = 'active'");
@@ -37,11 +37,7 @@ try {
     }
     
     $karyawans = [
-        'hrd@balnis.com' => 'hrd123',
-        'finance@balnis.com' => 'finance123',
-        'manager@balnis.com' => 'manager123',
-        'karyawan1@balnis.com' => 'pass123',
-        'karyawan2@balnis.com' => 'pass123'
+        'yourkiii13045@gmail.com' => 'karyawan123'
     ];
     
     foreach ($karyawans as $email => $pass) {
@@ -59,7 +55,7 @@ try {
     echo "<hr>";
     echo "<div style='background:#e3f2fd;padding:30px;border-radius:15px;font-size:18px;'>";
     echo "<h3>🎉 <strong>SETUP SELESAI 100%!</strong></h3>";
-    echo "<p><strong>ADMIN:</strong> admin@balnis.com / admin123</p>";
+    echo "<p><strong>ADMIN:</strong> $admin_email / $admin_pass</p>";
     echo "<p><strong>KARYAWAN:</strong></p>";
     echo "<ul>";
     foreach ($karyawans as $email => $pass) {

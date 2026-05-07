@@ -3,7 +3,7 @@ session_start();
 
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] === 'admin') {
-        header("Location: php_dashboard_admin/admin_dashboard.php");
+        header("Location: php_dashboard_admin/dashboard_admin.php");
     } else {
         header("Location: php_dashboard_karyawan/dashboard_karyawan.php");
     }
@@ -28,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user && password_verify($password, $user['password'])) {
-                // Update last_login
                 $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
                 $updateStmt->execute([$user['id']]);
                 

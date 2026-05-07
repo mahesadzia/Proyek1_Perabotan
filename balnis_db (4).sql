@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 06, 2026 at 04:46 PM
+-- Generation Time: May 07, 2026 at 03:55 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -177,6 +177,14 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `email`, `password`, `role`, `status`, `otp_code`, `otp_expires`, `last_login`, `created_at`) VALUES
+(1, 'ekimaulana102@gmail.com', '$2y$10$5LqDTlpv95JD9Ol66FH71eFqSpkO7AdwjQ4f7LR7GFRZTLwSOMLcK', 'admin', 'active', NULL, NULL, '2026-05-06 18:22:05', '2026-05-06 18:21:27'),
+(2, 'yourkiii13045@gmail.com', '$2y$10$lh8kp.WPjm6xlgkTMdGw2OmxPgIiWMatBv17M1DKAvVFhptZhCImm', 'karyawan', 'active', NULL, NULL, NULL, '2026-05-06 18:21:27');
+
+--
 -- Indexes for dumped tables
 --
 
@@ -268,7 +276,7 @@ ALTER TABLE `supplier`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
