@@ -228,3 +228,4 @@ tbody tr { transition: background 0.15s; }
 tbody tr:hover { background: #f0f7ff; }
 
 .total-bold { font-weight: 700; color: var(--primary-dark); }
+
