@@ -1,396 +1,309 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) { header("Location: ../login.php"); exit(); }
+if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
 include 'konek.php';
 
-// ─── Data user yang sedang login ──────────────────────────────────────────────
-$uid = $_SESSION['user_id'];
-$q_user = $conn->prepare("SELECT username, email, role, status, last_login, created_at FROM users WHERE id = ?");
-$q_user->bind_param("i", $uid);
-$q_user->execute();
-$user_data = $q_user->get_result()->fetch_assoc();
-$q_user->close();
-$inisial = strtoupper(substr($user_data['username'] ?? 'A', 0, 1));
+$notif = null;
 
+// --- LOGIKA FILTER & SORTING ---
+$sort_order = isset($_GET['sort']) && $_GET['sort'] == 'desc' ? 'DESC' : 'ASC';
+$tgl_mulai  = isset($_GET['tgl_mulai']) ? $_GET['tgl_mulai'] : '';
+$tgl_selesai = isset($_GET['tgl_selesai']) ? $_GET['tgl_selesai'] : '';
 
-
-$notif = null; // ['type' => 'success|danger|warning', 'msg' => '...']
-
-/* ─── SIMPAN ──────────────────────────────── */
-if (isset($_POST['simpan'])) {
-    $tanggal   = $_POST['tanggal'];
-    $id_barang = (int) $_POST['id_barang'];
-    $jumlah    = (int) $_POST['jumlah'];
-
-    if ($jumlah <= 0) {
-        $notif = ['type' => 'warning', 'msg' => 'Jumlah harus lebih dari 0.'];
+/* ─── LOGIKA SIMPAN BATCH ─────────────────────────── */
+if (isset($_POST['simpan_batch'])) {
+    $tanggal = $_POST['tanggal'];
+    $id_barangs = $_POST['id_barang']; 
+    $jumlahs    = $_POST['jumlah'];    
+    
+    if (empty($id_barangs)) {
+        $notif = ['type' => 'warning', 'msg' => 'Tambahkan minimal satu barang!'];
     } else {
-        // Ambil data barang dengan prepared statement
-        $stmt = $conn->prepare("SELECT harga_jual, stok, nama_barang FROM inventori_barang WHERE id_barang = ?");
-        $stmt->bind_param("i", $id_barang);
-        $stmt->execute();
-        $barang = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
+        $conn->begin_transaction();
+        try {
+            foreach ($id_barangs as $index => $id_b) {
+                $qty = (int)$jumlahs[$index];
+                $id_b = (int)$id_b;
 
-        if (!$barang) {
-            $notif = ['type' => 'danger', 'msg' => 'Barang tidak ditemukan.'];
-        } elseif ($jumlah > $barang['stok']) {
-            $notif = ['type' => 'warning', 'msg' => "Stok tidak cukup! Stok tersedia: {$barang['stok']} unit."];
-        } else {
-            $total = $jumlah * $barang['harga_jual'];
+                $st = $conn->prepare("SELECT harga_jual, stok, nama_barang FROM inventori_barang WHERE id_barang = ?");
+                $st->bind_param("i", $id_b);
+                $st->execute();
+                $b = $st->get_result()->fetch_assoc();
 
-            // Insert ke barang_keluar
-            $ins = $conn->prepare("INSERT INTO barang_keluar (tanggal, id_barang, jumlah, total) VALUES (?, ?, ?, ?)");
-            $ins->bind_param("siid", $tanggal, $id_barang, $jumlah, $total);
+                if ($b['stok'] < $qty) {
+                    throw new Exception("Stok barang '{$b['nama_barang']}' tidak cukup!");
+                }
 
-            // Kurangi stok
-            $upd = $conn->prepare("UPDATE inventori_barang SET stok = stok - ? WHERE id_barang = ?");
-            $upd->bind_param("ii", $jumlah, $id_barang);
+                $total = $qty * $b['harga_jual'];
+                $ins = $conn->prepare("INSERT INTO barang_keluar (tanggal, id_barang, jumlah, total) VALUES (?, ?, ?, ?)");
+                $ins->bind_param("siid", $tanggal, $id_b, $qty, $total);
+                $ins->execute();
 
-            if ($ins->execute() && $upd->execute()) {
-                $notif = ['type' => 'success', 'msg' => "Transaksi berhasil! <strong>{$barang['nama_barang']}</strong> x{$jumlah} — Rp " . number_format($total, 0, ',', '.')];
-            } else {
-                $notif = ['type' => 'danger', 'msg' => 'Gagal menyimpan transaksi. Coba lagi.'];
+                $upd = $conn->prepare("UPDATE inventori_barang SET stok = stok - ? WHERE id_barang = ?");
+                $upd->bind_param("ii", $qty, $id_b);
+                $upd->execute();
             }
-            $ins->close(); $upd->close();
+            $conn->commit();
+            $notif = ['type' => 'success', 'msg' => 'Batch transaksi berhasil disimpan!'];
+        } catch (Exception $e) {
+            $conn->rollback();
+            $notif = ['type' => 'danger', 'msg' => 'Gagal: ' . $e->getMessage()];
         }
     }
 }
 
-/* ─── HAPUS ───────────────────────────────── */
+/* ─── LOGIKA HAPUS ───────────────────────────────── */
 if (isset($_GET['hapus'])) {
-    $id = (int) $_GET['hapus'];
-
+    $id = (int)$_GET['hapus'];
     $stmt = $conn->prepare("SELECT id_barang, jumlah FROM barang_keluar WHERE id_keluar = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    $data = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
-    if ($data) {
-        $upd = $conn->prepare("UPDATE inventori_barang SET stok = stok + ? WHERE id_barang = ?");
-        $upd->bind_param("ii", $data['jumlah'], $data['id_barang']);
-        $upd->execute(); $upd->close();
-
-        $del = $conn->prepare("DELETE FROM barang_keluar WHERE id_keluar = ?");
-        $del->bind_param("i", $id);
-        $del->execute(); $del->close();
-
-        $notif = ['type' => 'success', 'msg' => 'Data dihapus &amp; stok dikembalikan.'];
+    $res = $stmt->get_result()->fetch_assoc();
+    
+    if ($res) {
+        $conn->query("UPDATE inventori_barang SET stok = stok + {$res['jumlah']} WHERE id_barang = {$res['id_barang']}");
+        $conn->query("DELETE FROM barang_keluar WHERE id_keluar = $id");
+        $notif = ['type' => 'success', 'msg' => 'Data dihapus & stok dikembalikan.'];
     }
 }
 
-/* ─── DATA UNTUK HALAMAN ──────────────────── */
-$res_barang = mysqli_query($conn, "SELECT * FROM inventori_barang ORDER BY nama_barang ASC");
+// Data barang untuk dropdown
+$res_barang = mysqli_query($conn, "SELECT * FROM inventori_barang WHERE stok > 0 ORDER BY nama_barang ASC");
+$barang_data = [];
+while($row = mysqli_fetch_assoc($res_barang)) { $barang_data[] = $row; }
 
-$res_riwayat = mysqli_query($conn, "
-    SELECT bk.id_keluar, bk.tanggal, bk.jumlah, bk.total, ib.nama_barang, ib.harga_jual
-    FROM barang_keluar bk
-    JOIN inventori_barang ib ON bk.id_barang = ib.id_barang
-    ORDER BY bk.id_keluar DESC
-");
+// Query Riwayat dengan Filter & Sort
+$query_riwayat = "SELECT bk.*, ib.nama_barang FROM barang_keluar bk JOIN inventori_barang ib ON bk.id_barang = ib.id_barang WHERE 1=1";
+if ($tgl_mulai && $tgl_selesai) {
+    $query_riwayat .= " AND bk.tanggal BETWEEN '$tgl_mulai' AND '$tgl_selesai'";
+}
+$query_riwayat .= " ORDER BY ib.nama_barang $sort_order";
+$res_riwayat = mysqli_query($conn, $query_riwayat);
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barang Keluar - Sistem Inventaris</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="barang_keluar.css">
-    <link rel="stylesheet" href="responsive.css">
+    <style>
+        :root {
+            --primary: #1565c0; --primary-dark: #0d47a1; --primary-light: #e3f0ff;
+            --sidebar-width: 240px; --text-main: #1a202c; --text-muted: #718096;
+            --bg-page: #f0f4f8; --bg-card: #ffffff; --border: #e2e8f0;
+            --radius: 10px; --shadow: 0 2px 12px rgba(21,101,192,0.08);
+            --danger: #e74c3c; --success: #22c55e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-page); color: var(--text-main); display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-width); background: var(--primary); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; box-shadow: 4px 0 20px rgba(13,71,161,0.18); }
+        .admin-profile { display: flex; align-items: center; gap: 10px; padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.12); color: #fff; font-weight: 600; }
+        .admin-profile i { font-size: 2rem; color: rgba(255,255,255,0.85); }
+        .sidebar a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: rgba(255,255,255,0.82); text-decoration: none; font-size: 0.875rem; border-left: 3px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.1); color: #fff; border-left-color: #fff; }
+        .sidebar h3 { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.45); padding: 20px 20px 8px; }
+        .logout-btn { margin-top: auto; color: #ff6b6b !important; padding-bottom: 24px; }
+
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; }
+        header { display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+        .content-container { padding: 24px 28px; animation: fadeUp 0.4s ease both; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .content-card { background: #fff; border-radius: var(--radius); padding: 24px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 24px; }
+        .content-card h3 { font-size: 1rem; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        /* BATCH INPUT STYLE */
+        .batch-row { display: grid; grid-template-columns: 2fr 1fr 1.5fr 50px; gap: 15px; align-items: center; margin-bottom: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .btn-add-row { background: #f1f5f9; color: var(--primary); border: 2px dashed var(--primary); padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: 700; margin: 10px 0; transition: 0.2s; }
+        .btn-add-row:hover { background: var(--primary-light); }
+        .btn-remove-row { color: var(--danger); cursor: pointer; border: none; background: none; font-size: 1.2rem; }
+
+        /* FILTER AREA (Gaya Gambar Laporan Anda) */
+        .filter-card-area { display: flex; align-items: flex-end; gap: 15px; flex-wrap: wrap; background: #f8fafc; padding: 18px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 160px; }
+        .filter-group label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+        .btn-filter { background: var(--primary); color: white; border: none; height: 42px; padding: 0 20px; border-radius: 6px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-reset { background: #e2e8f0; color: var(--text-main); text-decoration: none; height: 42px; padding: 0 20px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; }
+
+        /* FORM ELEMENTS */
+        input, select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: 700; margin-top: 15px; cursor: pointer; transition: 0.2s; }
+        .btn-submit:hover { background: var(--primary-dark); }
+
+        /* TABLE */
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f7faff; padding: 14px 16px; text-align: left; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--primary); border-bottom: 2px solid var(--border); }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+        .total-bold { font-family: 'DM Mono', monospace; font-weight: 700; color: var(--primary-dark); }
+        .btn-del { color: var(--danger); background: #fff5f5; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; font-weight: 600; }
+        
+        .sort-link { color: #cbd5e1; text-decoration: none; font-size: 0.75rem; margin-left: 4px; }
+        .sort-link.active { color: var(--primary); }
+
+        /* NOTIF */
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 0.875rem; border: 1px solid transparent; }
+        .alert-success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .alert-danger { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .alert-warning { background: #fef9c3; color: #854d0e; border-color: #fde68a; }
+    </style>
 </head>
 <body>
 
 <div class="sidebar-overlay" id="overlay"></div>
 
-<!-- ─── SIDEBAR ─────────────────────────── -->
 <div class="sidebar" id="sidebar">
     <div class="admin-profile">
         <i class="fas fa-user-circle"></i>
         <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
     </div>
-    <a href="admin_dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a href="dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a>
     <a href="inventori.php"><i class="fas fa-boxes"></i> Inventori</a>
     <h3>TRANSAKSI</h3>
     <a href="barang_masuk.php"><i class="fas fa-shopping-cart"></i> Barang Masuk</a>
     <a href="barang_keluar.php" class="active"><i class="fas fa-file-export"></i> Barang Keluar</a>
-    <h3>REPORT</h3>
+    <h3>LAPORAN</h3>
     <a href="laporan_barangmasuk.php"><i class="fas fa-chart-line"></i> Laporan Barang Masuk</a>
-    <a href="laporan_barangkeluar.php"><i class="fas fa-chart-bar"></i> Laporan Barang Keluar</a>
+    <a href="laporanBarangKeluar.php"><i class="fas fa-chart-bar"></i> Laporan Barang Keluar</a>
+    <h3>LAINNYA</h3>
+    <a href="setting.php"><i class="fas fa-cog"></i> Setelan</a>
     <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
-<!-- ─── MAIN ─────────────────────────────── -->
 <div class="main-wrapper">
-
     <header>
-        <div style="display:flex;align-items:center;gap:10px;">
-            <button class="hamburger" id="hamburger" aria-label="Menu"><span></span></button>
-            <span><i class="fas fa-file-export"></i> BARANG KELUAR</span>
-        </div>
-        <div style="position:relative;">
-            <button class="admin-header-btn" id="adminPopupBtn" onclick="toggleAdminPopup()" aria-haspopup="true">
-                <div class="avatar-circle"><?php echo $inisial; ?></div>
-                <span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?php echo htmlspecialchars($user_data['username']); ?></span>
-                <i class="fas fa-chevron-down chevron-icon"></i>
-            </button>
-            <div class="admin-popup" id="adminPopup">
-                <div class="popup-header">
-                    <div class="popup-avatar-large"><?php echo $inisial; ?></div>
-                    <div class="popup-header-info">
-                        <div class="popup-name"><?php echo htmlspecialchars($user_data['username']); ?></div>
-                        <div class="popup-role-badge">
-                            <i class="fas fa-shield-alt"></i>
-                            <?php echo ucfirst($user_data['role'] ?? 'admin'); ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="popup-body">
-                    <div class="popup-row">
-                        <i class="fas fa-envelope"></i>
-                        <span class="popup-row-val"><?php echo htmlspecialchars($user_data['email'] ?? '-'); ?></span>
-                    </div>
-                    <div class="popup-row">
-                        <i class="fas fa-circle" style="color:#48bb78;font-size:0.6rem;"></i>
-                        <span>Status:&nbsp;</span>
-                        <span class="popup-row-val"><span class="status-dot"></span><?php echo ucfirst($user_data['status'] ?? 'active'); ?></span>
-                    </div>
-                    <div class="popup-row">
-                        <i class="fas fa-clock"></i>
-                        <span>Login terakhir:&nbsp;</span>
-                        <span class="popup-row-val">
-                            <?php echo $user_data['last_login'] ? date('d M Y H:i', strtotime($user_data['last_login'])) : '-'; ?>
-                        </span>
-                    </div>
-                    <div class="popup-row">
-                        <i class="fas fa-calendar-plus"></i>
-                        <span>Bergabung:&nbsp;</span>
-                        <span class="popup-row-val">
-                            <?php echo $user_data['created_at'] ? date('d M Y', strtotime($user_data['created_at'])) : '-'; ?>
-                        </span>
-                    </div>
-                    <div class="popup-divider"></div>
-                </div>
-                <div class="popup-footer">
-                    <a href="logout.php" class="popup-logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Keluar dari Akun
-                    </a>
-                </div>
-            </div>
-        </div>
+        <div><i class="fas fa-file-export" style="color:var(--primary); margin-right:8px;"></i> BARANG KELUAR</div>
+        <div style="font-size:0.875rem; color:var(--text-muted);"><?= date('l, d F Y'); ?></div>
     </header>
 
-    <!-- Notifikasi -->
-    <?php if ($notif): ?>
-    <div class="alert alert-<?= $notif['type'] ?>">
-        <i class="fas fa-<?= $notif['type']==='success' ? 'check-circle' : ($notif['type']==='warning' ? 'exclamation-triangle' : 'times-circle') ?>"></i>
-        <?= $notif['msg'] ?>
-    </div>
-    <?php endif; ?>
+    <div class="content-container">
+        <?php if ($notif): ?>
+            <div class="alert alert-<?= $notif['type'] ?>"><?= $notif['msg'] ?></div>
+        <?php endif; ?>
 
-    <!-- ─── FORM INPUT ──────────────────── -->
-    <div class="content-card">
-        <h3><i class="fas fa-plus-circle"></i> Input Penjualan / Barang Keluar</h3>
-
-        <form method="POST" id="formKeluar">
-            <div class="form-grid">
-
-                <div>
-                    <label>Tanggal</label>
-                    <input type="date" name="tanggal" id="tanggal"
-                           value="<?= date('Y-m-d') ?>" required>
+        <div class="content-card">
+            <h3><i class="fas fa-plus-circle"></i> Input Penjualan Batch</h3>
+            <form method="POST">
+                <div style="max-width: 250px; margin-bottom: 20px;">
+                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">TANGGAL TRANSAKSI</label>
+                    <input type="date" name="tanggal" value="<?= date('Y-m-d') ?>" required>
                 </div>
 
-                <div>
-                    <label>Pilih Barang</label>
-                    <select name="id_barang" id="id_barang" required>
-                        <option value="">-- Pilih Barang --</option>
-                        <?php
-                        $barang_list = [];
-                        while ($b = mysqli_fetch_assoc($res_barang)):
-                            $barang_list[$b['id_barang']] = $b;
-                        ?>
-                        <option value="<?= $b['id_barang'] ?>"
-                                data-harga="<?= $b['harga_jual'] ?>"
-                                data-stok="<?= $b['stok'] ?>"
-                                data-nama="<?= htmlspecialchars($b['nama_barang']) ?>">
-                            <?= htmlspecialchars($b['nama_barang']) ?>
-                            &nbsp;|&nbsp; Stok: <?= $b['stok'] ?>
-                            &nbsp;|&nbsp; Rp <?= number_format($b['harga_jual'], 0, ',', '.') ?>
-                        </option>
-                        <?php endwhile; ?>
-                    </select>
-                    <div class="stok-info" id="stokInfo"></div>
+                <div id="batchContainer">
+                    </div>
+
+                <button type="button" class="btn-add-row" onclick="addRow()">
+                    <i class="fas fa-plus-circle"></i> Tambah Baris Barang
+                </button>
+
+                <div style="text-align: right; padding: 15px; border-top: 2px solid #e2e8f0; margin-top: 10px; font-weight: 800; font-size: 1.1rem; color: var(--primary-dark);">
+                    GRAND TOTAL: <span id="grandTotal">Rp 0</span>
                 </div>
 
-                <div>
-                    <label>Jumlah</label>
-                    <input type="number" name="jumlah" id="jumlah" min="1" placeholder="0" required>
-                </div>
+                <button type="submit" name="simpan_batch" class="btn-submit">
+                    <i class="fas fa-save"></i> SIMPAN SEMUA DATA BATCH
+                </button>
+            </form>
+        </div>
 
-                <div>
-                    <label>Total Harga (otomatis)</label>
-                    <input type="text" id="total_display" placeholder="Rp 0"
-                           readonly class="input-total">
-                    <input type="hidden" name="total_harga" id="total_harga">
-                </div>
+        <div class="content-card">
+            <h3><i class="fas fa-history"></i> Riwayat Penjualan</h3>
 
+            <form method="GET" class="filter-card-area">
+                <div class="filter-group">
+                    <label>Mulai Tanggal</label>
+                    <input type="date" name="tgl_mulai" value="<?= $tgl_mulai ?>">
+                </div>
+                <div class="filter-group">
+                    <label>Sampai Tanggal</label>
+                    <input type="date" name="tgl_selesai" value="<?= $tgl_selesai ?>">
+                </div>
+                <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Filter</button>
+                <?php if($tgl_mulai): ?>
+                    <a href="barang_keluar.php" class="btn-reset">Reset</a>
+                <?php endif; ?>
+            </form>
+
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>
+                                Nama Barang
+                                <a href="?sort=asc<?= $tgl_mulai ? "&tgl_mulai=$tgl_mulai&tgl_selesai=$tgl_selesai" : "" ?>" class="sort-link <?= $sort_order == 'ASC' ? 'active' : '' ?>"><i class="fas fa-sort-alpha-up"></i></a>
+                                <a href="?sort=desc<?= $tgl_mulai ? "&tgl_mulai=$tgl_mulai&tgl_selesai=$tgl_selesai" : "" ?>" class="sort-link <?= $sort_order == 'DESC' ? 'active' : '' ?>"><i class="fas fa-sort-alpha-down"></i></a>
+                            </th>
+                            <th>Jumlah</th>
+                            <th>Total</th>
+                            <th style="text-align:center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if(mysqli_num_rows($res_riwayat) > 0): ?>
+                            <?php while ($row = mysqli_fetch_assoc($res_riwayat)): ?>
+                            <tr>
+                                <td style="font-family:'DM Mono',monospace; font-size:0.82rem; color:var(--text-muted);"><?= date('d/m/Y', strtotime($row['tanggal'])) ?></td>
+                                <td style="font-weight:600;"><?= htmlspecialchars($row['nama_barang']) ?></td>
+                                <td><?= $row['jumlah'] ?></td>
+                                <td class="total-bold">Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
+                                <td style="text-align:center;">
+                                    <a href="barang_keluar.php?hapus=<?= $row['id_keluar'] ?>" class="btn-del" onclick="return confirm('Hapus data?')"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">Data tidak ditemukan.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
-
-            <button type="submit" name="simpan" class="btn-submit">
-                <i class="fas fa-save"></i> Simpan Transaksi
-            </button>
-        </form>
-    </div>
-
-    <!-- ─── TABEL RIWAYAT ───────────────── -->
-    <div class="content-card">
-        <h3><i class="fas fa-history"></i> Riwayat Penjualan</h3>
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Tanggal</th>
-                        <th>Barang</th>
-                        <th>Jumlah</th>
-                        <th>Harga Satuan</th>
-                        <th>Total</th>
-                        <th style="text-align:center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $no = 1;
-                    while ($row = mysqli_fetch_assoc($res_riwayat)): ?>
-                    <tr>
-                        <td style="color:var(--text-muted);font-size:0.8rem;"><?= $no++ ?></td>
-                        <td style="font-family:'DM Mono',monospace;font-size:0.82rem;color:#718096;">
-                            <?= date('d/m/Y', strtotime($row['tanggal'])) ?>
-                        </td>
-                        <td><?= htmlspecialchars($row['nama_barang']) ?></td>
-                        <td><?= $row['jumlah'] ?></td>
-                        <td style="font-family:'DM Mono',monospace;font-size:0.82rem;">
-                            Rp <?= number_format($row['harga_jual'], 0, ',', '.') ?>
-                        </td>
-                        <td class="total-bold">Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
-                        <td style="text-align:center;">
-                            <a href="barang_keluar.php?hapus=<?= $row['id_keluar'] ?>"
-                               onclick="return confirm('Hapus data ini? Stok akan dikembalikan.')"
-                               class="btn-del">
-                                <i class="fas fa-trash"></i> Hapus
-                            </a>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
         </div>
     </div>
-
-</div><!-- /.main-wrapper -->
+</div>
 
 <script>
-/* ─── Hamburger ───────────────────────────── */
-const hamburger = document.getElementById('hamburger');
-const sidebar   = document.getElementById('sidebar');
-const overlay   = document.getElementById('overlay');
+const barangs = <?php echo json_encode($barang_data); ?>;
 
-function openSidebar()  {
-    sidebar.classList.add('open');
-    overlay.classList.add('active');
-    hamburger.classList.add('open');
-    document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('active');
-    hamburger.classList.remove('open');
-    document.body.style.overflow = '';
-}
+function addRow() {
+    const container = document.getElementById('batchContainer');
+    const div = document.createElement('div');
+    div.className = 'batch-row';
+    
+    let options = '<option value="">-- Pilih Barang --</option>';
+    barangs.forEach(b => {
+        options += `<option value="${b.id_barang}" data-harga="${b.harga_jual}">${b.nama_barang} (Stok: ${b.stok})</option>`;
+    });
 
-hamburger.addEventListener('click', () =>
-    sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
-);
-overlay.addEventListener('click', closeSidebar);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
-function toggleAdminPopup() {
-    const btn   = document.getElementById('adminPopupBtn');
-    const popup = document.getElementById('adminPopup');
-    if (!btn || !popup) return;
-    const isOpen = popup.classList.contains('popup-show');
-    if (isOpen) {
-        popup.classList.remove('popup-show');
-        btn.classList.remove('popup-open');
-    } else {
-        popup.classList.add('popup-show');
-        btn.classList.add('popup-open');
-    }
-}
-document.addEventListener('click', function(e) {
-    const btn   = document.getElementById('adminPopupBtn');
-    const popup = document.getElementById('adminPopup');
-    if (btn && popup && !btn.contains(e.target) && !popup.contains(e.target)) {
-        popup.classList.remove('popup-show');
-        btn.classList.remove('popup-open');
-    }
-});
-
-
-/* ─── Hitung Total & Info Stok ────────────── */
-const selectBarang = document.getElementById('id_barang');
-const inputJumlah  = document.getElementById('jumlah');
-const totalDisplay = document.getElementById('total_display');
-const totalHarga   = document.getElementById('total_harga');
-const stokInfo     = document.getElementById('stokInfo');
-
-function updateUI() {
-    const opt    = selectBarang.selectedOptions[0];
-    const harga  = parseFloat(opt?.dataset.harga)  || 0;
-    const stok   = parseInt(opt?.dataset.stok)     || 0;
-    const nama   = opt?.dataset.nama               || '';
-    const jumlah = parseInt(inputJumlah.value)     || 0;
-    const total  = harga * jumlah;
-
-    // Info stok
-    if (nama) {
-        if (stok === 0) {
-            stokInfo.textContent = `Stok habis!`;
-            stokInfo.className   = 'stok-info kritis';
-        } else if (stok <= 10) {
-            stokInfo.textContent = `Stok tersisa: ${stok} unit (menipis)`;
-            stokInfo.className   = 'stok-info menipis';
-        } else {
-            stokInfo.textContent = `Stok tersisa: ${stok} unit`;
-            stokInfo.className   = 'stok-info aman';
-        }
-        // Batasi max input jumlah sesuai stok
-        inputJumlah.max = stok;
-    } else {
-        stokInfo.textContent = '';
-        stokInfo.className   = 'stok-info';
-    }
-
-    // Total
-    totalHarga.value   = total;
-    totalDisplay.value = total > 0
-        ? 'Rp ' + total.toLocaleString('id-ID')
-        : 'Rp 0';
+    div.innerHTML = `
+        <div><select name="id_barang[]" required onchange="calculate()">${options}</select></div>
+        <div><input type="number" name="jumlah[]" min="1" value="1" required oninput="calculate()"></div>
+        <div class="subtotal" style="font-family:'DM Mono'; font-weight:700; color:var(--primary);">Rp 0</div>
+        <div style="text-align:center;"><button type="button" class="btn-remove-row" onclick="this.parentElement.parentElement.remove(); calculate()"><i class="fas fa-trash-alt"></i></button></div>
+    `;
+    container.appendChild(div);
 }
 
-selectBarang.addEventListener('change', updateUI);
-inputJumlah.addEventListener('input',  updateUI);
+function calculate() {
+    let grandTotal = 0;
+    document.querySelectorAll('.batch-row').forEach(row => {
+        const sel = row.querySelector('select');
+        const hrg = sel.selectedOptions[0]?.dataset.harga || 0;
+        const qty = row.querySelector('input').value || 0;
+        const sub = hrg * qty;
+        row.querySelector('.subtotal').textContent = "Rp " + sub.toLocaleString('id-ID');
+        grandTotal += sub;
+    });
+    document.getElementById('grandTotal').textContent = "Rp " + grandTotal.toLocaleString('id-ID');
+}
 
-/* ─── Auto-dismiss notif setelah 5 detik ─── */
-const alert = document.querySelector('.alert');
-if (alert) setTimeout(() => {
-    alert.style.transition = 'opacity 0.5s';
-    alert.style.opacity    = '0';
-    setTimeout(() => alert.remove(), 500);
-}, 5000);
+window.onload = addRow;
 </script>
-
 </body>
 </html>
